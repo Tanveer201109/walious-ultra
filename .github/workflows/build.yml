@@ -1,4 +1,4 @@
-name: Build Walious Ultra APK
+          name: Build Walious Ultra APK
 on:
   workflow_dispatch:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.27.4'
           channel: 'stable'
 
       - name: Get dependencies
@@ -35,4 +35,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Walious-Ultra-Release-APK
-          path: walious
+          path: walious_ultra/build/app/outputs/flutter-apk/app-release.apk

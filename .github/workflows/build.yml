@@ -1,39 +1,8 @@
-name: Build Flutter APK
+- name: Build Debug APK
+  run: flutter build apk --debug
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: কোড চেকআউট করা
-        uses: actions/checkout@v4
-
-      - name: Java 17 সেটআপ করা
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Flutter সেটআপ করা
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.3'
-          channel: 'stable'
-          cache: true
-
-      - name: Flutter Dependencies ইনস্টল করা
-        run: flutter pub get
-
-      - name: Debug APK বিল্ড করা
-        run: flutter build apk --debug
-
-      - name: তৈরি হওয়া APK আপলোড করা
-        uses: actions/upload-artifact@v4
-        with:
-          name: walious-ultra-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+- name: Upload APK
+  uses: actions/upload-artifact@v4
+  with:
+    name: app-debug
+    path: build/app/outputs/flutter-apk/app-debug.apk  ← এই লাইনটা চেঞ্জ

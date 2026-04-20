@@ -47,4 +47,17 @@ flutter {
     source '../..'
 }
 
+dependencies {}    defaultConfig {
+        applicationId "com.example.walious_ultra"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+}
+
+flutter {
+    source '../..'
+}
+
 dependencies {}

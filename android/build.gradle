@@ -1,18 +1,8 @@
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
+android {
+    namespace "com.example.walious_ultra"
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+    
+    defaultConfig {
+        ...
     }
-}
-
-rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
-}
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
-}

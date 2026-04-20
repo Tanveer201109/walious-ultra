@@ -1,57 +1,39 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'dev.flutter.flutter-gradle-plugin'
-}
+name: Build Flutter APK
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
+    steps:
+      - name: কোড চেকআউট করা
+        uses: actions/checkout@v4
 
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
+      - name: Java 17 সেটআপ করা
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-android {
-    namespace "com.example.walious_ultra"
-    compileSdkVersion 34
-    ndkVersion "25.1.8937393"
+      - name: Flutter সেটআপ করা
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
+      - name: Flutter Dependencies ইনস্টল করা
+        run: flutter pub get
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+      - name: Debug APK বিল্ড করা
+        run: flutter build apk --debug
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
-    defaultConfig {
-        applicationId "com.example.walious_ultra"
-        minSdkVersion 21
-        targetSdkVersion 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-    }
-}
-
-flutter {
-    source '../..'
-}
-
-dependencies {}
+      - name: তৈরি হওয়া APK আপলোড করা
+        uses: actions/upload-artifact@v4
+        with:
+          name: walious-ultra-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk

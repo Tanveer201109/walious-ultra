@@ -15,15 +15,16 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+          cache: 'gradle'
           
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
           
       - run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --debug --verbose
       
       - uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: app-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk

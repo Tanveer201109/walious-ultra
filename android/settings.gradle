@@ -1,39 +1,26 @@
-name: Build Flutter APK
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdk = properties.getProperty("flutter.sdk")
+        assert flutterSdk != null, "flutter.sdk not set in local.properties"
+        return flutterSdk
+    }
+    settings.ext.flutterSdkPath = flutterSdkPath()
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+    includeBuild("${settings.ext.flutterSdkPath}/packages/flutter_tools/gradle")
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
-    steps:
-      - name: কোড চেকআউট করা
-        uses: actions/checkout@v4
+plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    id "com.android.application" version "8.1.0" apply false
+    id "org.jetbrains.kotlin.android" version "1.9.22" apply false
+}
 
-      - name: Java 17 সেটআপ করা
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Flutter সেটআপ করা
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-          cache: true
-
-      - name: Flutter Dependencies ইনস্টল করা
-        run: flutter pub get
-
-      - name: Debug APK বিল্ড করা
-        run: flutter build apk --debug
-
-      - name: তৈরি হওয়া APK আপলোড করা
-        uses: actions/upload-artifact@v4
-        with:
-          name: walious-ultra-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+include ":app"

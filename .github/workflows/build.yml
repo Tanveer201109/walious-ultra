@@ -1,16 +1,45 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          
+      - name: Dependencies ইনস্টল
+        run: flutter pub get
+
       - name: Gradle দিয়ে APK বিল্ড (The Ultimate Force Fix)
         run: |
-          echo "=== লেভেল ১: লিনাক্স কমান্ড দিয়ে ব্যাকস্ল্যাশ পরিষ্কার করা ==="
-          # ফাইল থেকে সরাসরি ব্যাকস্ল্যাশ মুছে ফেলার কমান্ড
-          sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
+          echo "=== লেভেল ১: সিনট্যাক্স ভুলের জন্য ফাইল অটো-স্যানিটাইজ করা ==="
+          sed -i 's/https:\\\/\//https:\/\/\//g' android/gradle/wrapper/gradle-wrapper.properties
           
-          echo "=== লেভেল ২: ফাইল ভেরিফিকেশন (এখনই সত্য জানা যাবে) ==="
+          echo "=== লেভেল ২: ফাইল ভেরিফিকেশন ==="
           cat android/gradle/wrapper/gradle-wrapper.properties
           
-          echo "=== লেভেল ৩: পারমিশন এবং বিল্ড শুরু ==="
+          echo "=== লেভেল ৩: গ্রাডেল রান ==="
           cd android
           chmod +x ./gradlew
-          
-          echo "=== লেভেল ৪: গ্রাডেল ইঞ্জিন স্টার্ট (Stacktrace সহ) ==="
           ./gradlew assembleDebug --stacktrace --info
           cd ..
+
+      - name: APK আপলোড
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn

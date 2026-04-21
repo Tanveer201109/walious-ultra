@@ -29,24 +29,16 @@ jobs:
       - name: Dependencies ইনস্টল
         run: flutter pub get
 
-      - name: Gradle দিয়ে APK বিল্ড (The Force Fix)
+      - name: Flutter দিয়ে APK বিল্ড (The Ultimate Fix)
         run: |
-          echo "=== ব্যাকস্ল্যাশ পরিষ্কার করা ==="
+          echo "=== লেভেল ১: ব্যাকস্ল্যাশ ক্লিনআপ সার্জারি ==="
           sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
+          echo "=== ক্লিনআপ শেষ, ফাইল চেক ==="
           cat android/gradle/wrapper/gradle-wrapper.properties
-          cd android
-          chmod +x ./gradlew
-          ./gradlew assembleDebug --stacktrace --info
-          cd ..
-
-      - name: APK ফাইল চেক এবং কপি
-        if: always()
-        run: |
-          echo "=== আউটপুট চেক ==="
-          ls -R android/app/build/outputs/apk/debug/ || echo "ফাইল তৈরি হয়নি"
-          mkdir -p build/app/outputs/flutter-apk/
-          cp android/app/build/outputs/apk/debug/app-debug.apk build/app/outputs/flutter-apk/ || echo "কপি করা সম্ভব হয়নি"
-
+          
+          echo "=== লেভেল ২: ফ্লাটার বিল্ড শুরু (এটি ২-৫ মিনিট সময় নেবে) ==="
+          flutter build apk --debug --verbose
+          
       - name: APK আপলোড
         uses: actions/upload-artifact@v4
         if: always()

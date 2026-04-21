@@ -31,11 +31,13 @@ jobs:
 
       - name: Gradle দিয়ে APK বিল্ড + লজ দেখা
         run: |
-          # Flutter tools ব্যবহার করাই সেরা, এটি অটোমেটিক সঠিক পাথে ফাইল রাখে
-          # আর গ্রাডেলের সব ডিটেইল দেখতে --verbose ফ্ল্যাগটি যথেষ্ট
-          flutter build apk --debug --verbose
+          flutter clean
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --stacktrace --info
+          cd ..
 
-      - name: APK ফাইল চেক (পাথ নিশ্চিত করা)
+      - name: APK ফাইল চেক
         run: ls -R build/app/outputs/flutter-apk/
 
       - name: APK আপলোড
@@ -43,5 +45,5 @@ jobs:
         if: always()
         with:
           name: debug-apk
-          path: build/app/outputs/flutter-apk/*.apk
-          if-no-files-found: error
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: warn

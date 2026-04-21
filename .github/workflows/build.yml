@@ -2,12 +2,13 @@ name: Build Flutter APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout কোড
         uses: actions/checkout@v4
@@ -15,60 +16,51 @@ jobs:
       - name: Java 17 সেটআপ
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
       - name: Flutter সেটআপ
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.x'
-          channel: 'stable'
+          channel: stable
+          cache: true
 
-      - name: Flutter ক্লিন এবং APK বিল্ড (AGP + Namespace + Auto Package Fix)
+      - name: Android config যাচাই
+        shell: bash
         run: |
-          echo "=== লেভেল ১: গ্রাডেল ফাইল ক্লিনআপ ==="
-          sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
-          
-          echo "=== লেভেল ২: AGP ভার্সন মাস্টার ফিক্স ==="
-          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' {} +
-          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' {} +
-          
-          if [ -f android/build.gradle ]; then
-            sed -i 's/com.android.tools.build:gradle:.*"/com.android.tools.build:gradle:8.3.0"/g' android/build.gradle
+          set -euxo pipefail
+
+          if [ -f android/app/build.gradle ]; then
+            echo "Groovy Gradle file detected"
+
+            PACKAGE_NAME=$(grep -oP 'applicationId\s+"[^"]+"' android/app/build.gradle | head -1 | cut -d'"' -f2 || true)
+            if [ -z "${PACKAGE_NAME:-}" ] && [ -f android/app/src/main/AndroidManifest.xml ]; then
+              PACKAGE_NAME=$(grep -oP 'package="[^"]+"' android/app/src/main/AndroidManifest.xml | head -1 | cut -d'"' -f2 || true)
+            fi
+
+            echo "Detected package: ${PACKAGE_NAME:-not-found}"
+
+            if [ -n "${PACKAGE_NAME:-}" ]; then
+              grep -q 'namespace ' android/app/build.gradle || \
+                sed -i "/android[[:space:]]*{/a\\    namespace \"$PACKAGE_NAME\"" android/app/build.gradle
+            fi
           fi
 
-          echo "=== লেভেল ২.৫: Namespace + SDK অটো ফিক্স ==="
-          PACKAGE_NAME=$(grep "applicationId" android/app/build.gradle | head -1 | awk -F'"' '{print $2}')
-          if [ -z "$PACKAGE_NAME" ]; then
-            PACKAGE_NAME=$(grep "package=" android/app/src/main/AndroidManifest.xml | awk -F'"' '{print $2}')
-          fi
-          echo "Detected Package Name: $PACKAGE_NAME"
-          
-          sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle
-          sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle
-          sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle
-          
-          if grep -q "namespace" android/app/build.gradle; then
-            sed -i "s/namespace \".*\"/namespace \"$PACKAGE_NAME\"/g" android/app/build.gradle
-          else
-            sed -i "/android[ ]*{/a \    namespace \"$PACKAGE_NAME\"" android/app/build.gradle
-          fi
-          
-          echo "=== app/build.gradle চেক ==="
-          grep -A 15 "android {" android/app/build.gradle
-          
-          echo "=== লেভেল ৩: ফ্রেশ ক্লিনআপ ও বিল্ড শুরু ==="
-          flutter clean
-          flutter pub get
-          flutter build apk --debug --verbose --no-tree-shake-icons
-          
-          echo "=== লেভেল ৪: এপিকে ভেরিফিকেশন ==="
-          ls -R build/app/outputs/flutter-apk/
+      - name: Flutter clean
+        run: flutter clean
 
-      - name: এপিকে ডাউনলোড করুন
+      - name: Dependencies ইনস্টল
+        run: flutter pub get
+
+      - name: APK বিল্ড
+        run: flutter build apk --release --verbose
+
+      - name: APK ফাইল দেখুন
+        run: ls -R build/app/outputs/flutter-apk/
+
+      - name: APK আপলোড
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: Walious-Ultra-Final-APK
+          name: app-release-apk
           path: build/app/outputs/flutter-apk/*.apk
-          if-no-files-found: error

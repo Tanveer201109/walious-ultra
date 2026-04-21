@@ -2,9 +2,7 @@ name: Build Flutter APK
 
 on:
   push:
-    branches: [main, master, develop]
-  pull_request:
-    branches: [main, master]
+    branches: 
   workflow_dispatch:
 
 jobs:
@@ -16,17 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Java JDK 11
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           cache: gradle
       
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: '3.24.x'
           channel: 'stable'
           cache: true
       
@@ -35,25 +33,23 @@ jobs:
           flutter --version
           flutter doctor -v
       
+      - name: Clean previous builds
+        run: flutter clean
+      
       - name: Get Flutter dependencies
         run: flutter pub get
       
-      - name: Clean previous builds
-        run: |
-          flutter clean
-          rm -rf build/
-          cd android && rm -rf .gradle && cd ..
-      
       - name: Build APK Release
-        run: flutter build apk --release -v
+        run: flutter build apk --release --verbose
       
       - name: Check APK generation
         run: |
-          if [ -f "build/app/outputs/apk/release/app-release.apk" ]; then
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
             echo "✅ APK generated successfully"
-            ls -lh build/app/outputs/apk/release/app-release.apk
+            ls -lh build/app/outputs/flutter-apk/app-release.apk
           else
             echo "❌ APK not found"
+            echo "Searching for APKs..."
             find build -name "*.apk" 2>/dev/null || echo "No APK files found"
             exit 1
           fi
@@ -63,5 +59,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
-          path: build/app/outputs/apk/release/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+          if-no-files-found: error

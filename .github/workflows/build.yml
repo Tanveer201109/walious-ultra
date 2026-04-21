@@ -1,69 +1,16 @@
-name: Build Flutter APK
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout কোড
-        uses: actions/checkout@v4
-
-      - name: Java 17 সেটআপ
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Flutter সেটআপ
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.x'
-          channel: 'stable'
-
-      - name: Dependencies ইনস্টল
-        run: flutter pub get
-
-      - name: Gradle দিয়ে APK বিল্ড + গভীর লগ দেখা
+      - name: Gradle দিয়ে APK বিল্ড (The Ultimate Force Fix)
         run: |
-          echo "=== লেভেল ১: রুট ডিরেক্টরি চেক ==="
-          ls -la
+          echo "=== লেভেল ১: লিনাক্স কমান্ড দিয়ে ব্যাকস্ল্যাশ পরিষ্কার করা ==="
+          # ফাইল থেকে সরাসরি ব্যাকস্ল্যাশ মুছে ফেলার কমান্ড
+          sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
           
-          if [ ! -d "android" ]; then
-            echo "এরর: android ফোল্ডার খুঁজে পাওয়া যায়নি!"
-            exit 1
-          fi
-
-          echo "=== লেভেল ২: Gradlew চেক এবং পারমিশন ==="
+          echo "=== লেভেল ২: ফাইল ভেরিফিকেশন (এখনই সত্য জানা যাবে) ==="
+          cat android/gradle/wrapper/gradle-wrapper.properties
+          
+          echo "=== লেভেল ৩: পারমিশন এবং বিল্ড শুরু ==="
           cd android
-          ls -la
-          if [ ! -f "gradlew" ]; then
-            echo "এরর: gradlew ফাইল নেই!"
-            exit 1
-          fi
           chmod +x ./gradlew
-
-          echo "=== লেভেল ৩: গ্রাডেল পোস্টমর্টেম শুরু ==="
+          
+          echo "=== লেভেল ৪: গ্রাডেল ইঞ্জিন স্টার্ট (Stacktrace সহ) ==="
           ./gradlew assembleDebug --stacktrace --info
           cd ..
-
-      - name: APK ফাইল চেক এবং কপি
-        if: always()
-        run: |
-          echo "=== আউটপুট চেক ==="
-          ls -R android/app/build/outputs/apk/debug/ || echo "ফাইল তৈরি হয়নি"
-          mkdir -p build/app/outputs/flutter-apk/
-          cp android/app/build/outputs/apk/debug/app-debug.apk build/app/outputs/flutter-apk/ || echo "কপি করা সম্ভব হয়নি"
-
-      - name: APK আপলোড
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: warn

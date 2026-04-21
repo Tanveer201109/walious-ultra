@@ -9,30 +9,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Java 17 সেটআপ করা
-        uses: actions/setup-java@v4
+      
+      - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: '17'
-
-      - name: Flutter সেটআপ করা
-        uses: subosito/flutter-action@v2
+          
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.x'
+          flutter-version: '3.22.2'
           channel: 'stable'
-
-      - name: Debug APK বিল্ড করা
-        run: |
-          flutter clean
-          flutter pub get
-          flutter build apk --debug --verbose
-
-      - name: APK আপলোড করা
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          cache: true
+          
+      - run: flutter pub get
+      
+      - run: flutter build apk --debug

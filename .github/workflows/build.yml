@@ -2,7 +2,7 @@ name: Build Flutter APK
 
 on:
   push:
-    branches: 
+    branches: [main, master, develop]
   workflow_dispatch:
 
 jobs:
@@ -28,11 +28,6 @@ jobs:
           channel: 'stable'
           cache: true
       
-      - name: Verify Flutter setup
-        run: |
-          flutter --version
-          flutter doctor -v
-      
       - name: Clean previous builds
         run: flutter clean
       
@@ -41,18 +36,6 @@ jobs:
       
       - name: Build APK Release
         run: flutter build apk --release --verbose
-      
-      - name: Check APK generation
-        run: |
-          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
-            echo "✅ APK generated successfully"
-            ls -lh build/app/outputs/flutter-apk/app-release.apk
-          else
-            echo "❌ APK not found"
-            echo "Searching for APKs..."
-            find build -name "*.apk" 2>/dev/null || echo "No APK files found"
-            exit 1
-          fi
       
       - name: Upload APK
         if: success()

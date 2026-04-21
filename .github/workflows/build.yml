@@ -1,4 +1,5 @@
 name: Build Flutter APK
+
 on:
   push:
     branches: [ main ]
@@ -23,19 +24,20 @@ jobs:
           flutter-version: '3.24.x'
           channel: 'stable'
 
-      - name: Flutter ক্লিন এবং APK বিল্ড (AGP Killer Fix)
+      - name: Flutter ক্লিন এবং APK বিল্ড (AGP Universal Fix)
         run: |
           echo "=== লেভেল ১: গ্রাডেল ফাইল ক্লিনআপ ==="
           sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
           cat android/gradle/wrapper/gradle-wrapper.properties
           
-          echo "=== লেভেল ২: AGP ভার্সন ফিক্স ==="
-          sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' android/settings.gradle
-          sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' android/settings.gradle
+          echo "=== লেভেল ২: AGP ভার্সন স্মার্ট ফিক্স ==="
+          # settings.gradle বা settings.gradle.kts যেখানেই থাকুক খুঁজে আপডেট করবে
+          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' {} +
+          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' {} +
           echo "=== settings.gradle চেক ==="
-          cat android/settings.gradle
+          find android/ -name "settings.gradle*" -exec cat {} +
           
-          echo "=== লেভেল ৩: পুরনো ক্যাশ 100% ক্লিয়ার করা ==="
+          echo "=== লেভেল ৩: পুরনো ক্যাশ ক্লিয়ার করা ==="
           flutter clean
           flutter pub get
           

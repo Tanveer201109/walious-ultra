@@ -7,14 +7,11 @@ void main() {
   runApp(const ZAiMailApp());
 }
 
-// CUSTOM COLORS
 class ZAiColors {
   static const crystalDark = Color(0xFF0c1110);
   static const emeraldGlow = Color(0xFF10B981);
-  static const matteOverlay = Color(0x0AFFFFFF);
   static const cardColor = Color(0xFF131918);
   static const googleRed = Color(0xFFDB4437);
-  static const facebookBlue = Color(0xFF1877F2);
 }
 
 class ZAiMailApp extends StatelessWidget {
@@ -34,7 +31,6 @@ class ZAiMailApp extends StatelessWidget {
   }
 }
 
-// SPLASH SCREEN - স্মোক + রেডিয়াল ব্লার + বিজলি ইফেক্ট
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -42,3 +38,100 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _glowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _glowAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(_controller);
+
+    Timer(const Duration(seconds: 3), () async {
+      await _initAdMob();
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const ChooseAccountPage()),
+        );
+      }
+    });
+  }
+
+  Future<void> _initAdMob() async {
+    try {
+      await MobileAds.instance.initialize();
+    } catch (e) {
+      debugPrint('AdMob Init Error: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ZAiColors.crystalDark,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.center,
+                radius: 1.5,
+                colors: [
+                  Color(0x1A10B981),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(0, -0.5),
+                radius: 1.2,
+                colors: [
+                  Colors.white.withOpacity(0.03),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          Center(
+            child: AnimatedBuilder(
+              animation: _glowAnimation,
+              builder: (context, child) {
+                return Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: ZAiColors.emeraldGlow
+                            .withOpacity(_glowAnimation.value * 0.6),
+                        blurRadius: 100,
+                        spreadRadius: 20,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.flash_on,
+                        size: 60,
+                        color: ZAiColors.emeraldGlow
+                            .withOpacity(_glowAnimation.value),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Z A I',
+                        style: TextStyle(
+                          fontSize

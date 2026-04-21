@@ -1,4 +1,14 @@
 pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        def propertiesFile = new File(rootDir.parentFile, '.flutter-plugins-dependencies')
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.newInputStream())
+        }
+        properties.getProperty('flutter.sdk', null)
+    }()
+    settings.ext.flutterSdkPath = flutterSdkPath
+
     repositories {
         google()
         mavenCentral()
@@ -7,10 +17,26 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
     id "com.android.application" version "8.3.0" apply false
     id "com.android.library" version "8.3.0" apply false
     id "org.jetbrains.kotlin.android" version "1.9.0" apply false
 }
 
 include ":app"
+
+def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
+
+def plugins = new Properties()
+def pluginsFile = new File(flutterProjectRoot.toFile(), '.flutter-plugins')
+if (pluginsFile.exists()) {
+    pluginsFile.withReader('UTF-8') { reader -> plugins.load(reader) }
+}
+
+plugins.each { name, path ->
+    def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
+    if (pluginDirectory.exists()) {
+        include ":$name"
+        project(":$name").projectDir = pluginDirectory
+    }
+}

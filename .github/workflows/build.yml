@@ -29,17 +29,36 @@ jobs:
       - name: Dependencies ইনস্টল
         run: flutter pub get
 
-      - name: Gradle দিয়ে APK বিল্ড + লগ দেখা
+      - name: Gradle দিয়ে APK বিল্ড + গভীর লগ দেখা
         run: |
-          flutter clean
+          echo "=== লেভেল ১: রুট ডিরেক্টরি চেক ==="
+          ls -la
+          
+          if [ ! -d "android" ]; then
+            echo "এরর: android ফোল্ডার খুঁজে পাওয়া যায়নি!"
+            exit 1
+          fi
+
+          echo "=== লেভেল ২: Gradlew চেক এবং পারমিশন ==="
           cd android
+          ls -la
+          if [ ! -f "gradlew" ]; then
+            echo "এরর: gradlew ফাইল নেই!"
+            exit 1
+          fi
           chmod +x ./gradlew
+
+          echo "=== লেভেল ৩: গ্রাডেল পোস্টমর্টেম শুরু ==="
           ./gradlew assembleDebug --stacktrace --info
           cd ..
 
-      - name: APK ফাইল চেক
+      - name: APK ফাইল চেক এবং কপি
         if: always()
-        run: ls -R build/app/outputs/flutter-apk/
+        run: |
+          echo "=== আউটপুট চেক ==="
+          ls -R android/app/build/outputs/apk/debug/ || echo "ফাইল তৈরি হয়নি"
+          mkdir -p build/app/outputs/flutter-apk/
+          cp android/app/build/outputs/apk/debug/app-debug.apk build/app/outputs/flutter-apk/ || echo "কপি করা সম্ভব হয়নি"
 
       - name: APK আপলোড
         uses: actions/upload-artifact@v4

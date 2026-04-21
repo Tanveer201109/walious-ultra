@@ -1,3 +1,29 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout কোড
+        uses: actions/checkout@v4
+
+      - name: Java 17 সেটআপ
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Flutter সেটআপ
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+
       - name: Flutter ক্লিন এবং APK বিল্ড (AGP + Namespace + Root Fix)
         run: |
           echo "=== লেভেল ১: গ্রাডেল ফাইল ক্লিনআপ ==="
@@ -27,7 +53,6 @@
           flutter pub get
           
           echo "=== লেভেল ৪: ফ্রেশ বিল্ড শুরু ==="
-          # সব আর্কিটেকচারের জন্য বিল্ড করো
           flutter build apk --debug --verbose --no-tree-shake-icons
           
           echo "=== লেভেল ৫: APK খুঁজে বের করো ==="

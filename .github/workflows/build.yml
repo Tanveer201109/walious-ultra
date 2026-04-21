@@ -2,44 +2,30 @@ name: Build Flutter APK
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Java JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
-      
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.x'
           channel: 'stable'
           cache: true
-      
-      - name: Clean previous builds
-        run: flutter clean
-      
-      - name: Get Flutter dependencies
-        run: flutter pub get
-      
-      - name: Build APK Release
-        run: flutter build apk --release --verbose
-      
-      - name: Upload APK
+      - run: flutter clean
+      - run: flutter pub get
+      - run: flutter build apk --release --verbose
+      - uses: actions/upload-artifact@v4
         if: success()
-        uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
           path: build/app/outputs/flutter-apk/app-release.apk

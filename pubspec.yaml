@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   camera: ^0.10.5+9
-  google_mobile_ads: ^5.3.1
+  # google_mobile_ads: ^5.3.1  <- AdMob বাদ, APK টেস্টের জন্য
 
 dev_dependencies:
   flutter_test:

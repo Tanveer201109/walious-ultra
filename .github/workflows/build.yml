@@ -24,45 +24,5 @@ jobs:
           flutter-version: '3.24.x'
           channel: 'stable'
 
-      - name: Flutter ক্লিন এবং APK বিল্ড (AGP + Namespace + Root Fix)
+      - name: Flutter ক্লিন এবং APK বিল্ড (AGP + Namespace + Auto Package Fix)
         run: |
-          echo "=== লেভেল ১: গ্রাডেল ফাইল ক্লিনআপ ==="
-          sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
-          
-          echo "=== লেভেল ২: AGP ভার্সন রুট এবং সেটিংস ফিক্স ==="
-          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' {} +
-          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' {} +
-          
-          if [ -f android/build.gradle ]; then
-            sed -i 's/com.android.tools.build:gradle:.*"/com.android.tools.build:gradle:8.3.0"/g' android/build.gradle
-          fi
-
-          echo "=== লেভেল ২.৫: Namespace + SDK ফিক্স ==="
-          sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle
-          sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle
-          sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle
-          
-          if grep -q "namespace" android/app/build.gradle; then
-            sed -i 's/namespace ".*"/namespace "com.example.walious_ultra"/g' android/app/build.gradle
-          else
-            sed -i '/android[ ]*{/a \    namespace "com.example.walious_ultra"' android/app/build.gradle
-          fi
-          
-          echo "=== লেভেল ৩: ডিপেন্ডেন্সি আপডেট ==="
-          flutter clean
-          flutter pub get
-          
-          echo "=== লেভেল ৪: ফ্রেশ বিল্ড শুরু ==="
-          flutter build apk --debug --verbose --no-tree-shake-icons
-          
-          echo "=== লেভেল ৫: APK খুঁজে বের করো ==="
-          find . -name "*.apk" -type f
-
-      - name: APK আপলোড
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Walious-Ultra-Debug
-          path: |
-            **/*.apk
-          if-no-files-found: warn

@@ -38,7 +38,9 @@ jobs:
           
           echo "=== লেভেল ২.৫: Namespace + SDK ফিক্স ==="
           # app/build.gradle এ namespace এবং SDK ভার্সন ইনজেক্ট করা
-          sed -i '/android {/a \    namespace "com.example.walious_ultra"' android/app/build.gradle
+          if ! grep -q "namespace" android/app/build.gradle; then
+            sed -i '/android {/a \    namespace "com.example.walious_ultra"' android/app/build.gradle
+          fi
           sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle
           sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle
           sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle

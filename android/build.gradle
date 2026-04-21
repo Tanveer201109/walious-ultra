@@ -1,2 +1,2 @@
-// AGP 8+ uses settings.gradle for plugin management
-// This file should be empty for Flutter projects
+// This file is intentionally left empty for AGP 8.1.0
+// Do not add dependencies here

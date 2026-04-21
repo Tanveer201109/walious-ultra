@@ -57,5 +57,4 @@ flutter {
 }
 
 dependencies {
-    // খালি রাখো। Flutter প্লাগিন kotlin-stdlib অটো অ্যাড করে
 }

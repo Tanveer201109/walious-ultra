@@ -1,9 +1,6 @@
 pluginManagement {
-    def flutterSdkPath = System.getenv("FLUTTER_ROOT")
-    assert flutterSdkPath != null, "FLUTTER_ROOT not set. Run flutter doctor."
+    includeBuild("${System.getenv('FLUTTER_ROOT')}/packages/flutter_tools/gradle")
     
-    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-
     repositories {
         google()
         mavenCentral()

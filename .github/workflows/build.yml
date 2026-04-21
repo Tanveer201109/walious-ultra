@@ -1,46 +1,23 @@
-name: Build Flutter APK
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout কোড
-        uses: actions/checkout@v4
-
-      - name: Java 17 সেটআপ
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Flutter সেটআপ
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.x'
-          channel: 'stable'
-
-      - name: Flutter ডক্টর চেক
-        run: flutter doctor -v
-
-      - name: Flutter ক্লিন এবং APK বিল্ড (The Real Final Victory)
+      - name: Flutter ক্লিন এবং APK বিল্ড (AGP Killer Fix)
         run: |
           echo "=== লেভেল ১: গ্রাডেল ফাইল ক্লিনআপ ==="
           sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
           cat android/gradle/wrapper/gradle-wrapper.properties
           
-          echo "=== লেভেল ২: পুরনো ক্যাশ 100% ক্লিয়ার করা ==="
+          echo "=== লেভেল ২: AGP ভার্সন ফিক্স ==="
+          sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' android/settings.gradle
+          sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' android/settings.gradle
+          echo "=== settings.gradle চেক ==="
+          cat android/settings.gradle
+          
+          echo "=== লেভেল ৩: পুরনো ক্যাশ 100% ক্লিয়ার করা ==="
           flutter clean
           flutter pub get
           
-          echo "=== লেভেল ৩: ফ্রেশ বিল্ড শুরু ==="
-          flutter build apk --debug --verbose
+          echo "=== লেভেল ৪: ফ্রেশ বিল্ড শুরু ==="
+          flutter build apk --debug --verbose --no-tree-shake-icons
           
-          echo "=== লেভেল ৪: APK খুঁজে বের করো ==="
+          echo "=== লেভেল ৫: APK খুঁজে বের করো ==="
           find . -name "*.apk" -type f
 
       - name: APK আপলোড

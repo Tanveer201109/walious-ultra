@@ -26,15 +26,43 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Android config যাচাই
+      - name: Android config safe fix
         shell: bash
         run: |
           set -euxo pipefail
 
-          if [ -f android/app/build.gradle ]; then
-            echo "Groovy Gradle file detected"
+          echo "=== Gradle wrapper normalize ==="
+          if [ -f android/gradle/wrapper/gradle-wrapper.properties ]; then
+            sed -i 's#https\\://#https://#g' android/gradle/wrapper/gradle-wrapper.properties
+            sed -i 's#gradle-[0-9.]*-\(all\|bin\)\.zip#gradle-8.4-bin.zip#g' android/gradle/wrapper/gradle-wrapper.properties || true
+            cat android/gradle/wrapper/gradle-wrapper.properties
+          fi
 
-            PACKAGE_NAME=$(grep -oP 'applicationId\s+"[^"]+"' android/app/build.gradle | head -1 | cut -d'"' -f2 || true)
+          echo "=== AGP align (Groovy/KTS) ==="
+          find android -name "settings.gradle" -exec sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' {} \; || true
+          find android -name "settings.gradle" -exec sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' {} \; || true
+          find android -name "settings.gradle.kts" -exec sed -i 's/id("com.android.application") version ".*"/id("com.android.application") version "8.3.0"/g' {} \; || true
+          find android -name "settings.gradle.kts" -exec sed -i 's/id("com.android.library") version ".*"/id("com.android.library") version "8.3.0"/g' {} \; || true
+
+          if [ -f android/build.gradle ]; then
+            sed -i 's/com.android.tools.build:gradle:[^"]*/com.android.tools.build:gradle:8.3.0/g' android/build.gradle || true
+          fi
+
+          if [ -f android/build.gradle.kts ]; then
+            sed -i 's/com.android.tools.build:gradle:[^"]*/com.android.tools.build:gradle:8.3.0/g' android/build.gradle.kts || true
+          fi
+
+          echo "=== Namespace auto-fix ==="
+          APP_GRADLE=""
+          if [ -f android/app/build.gradle ]; then
+            APP_GRADLE="android/app/build.gradle"
+          elif [ -f android/app/build.gradle.kts ]; then
+            APP_GRADLE="android/app/build.gradle.kts"
+          fi
+
+          if [ -n "$APP_GRADLE" ]; then
+            PACKAGE_NAME=$(grep -oP 'applicationId\s*[= ]\s*"[^"]+"' "$APP_GRADLE" | head -1 | cut -d'"' -f2 || true)
+
             if [ -z "${PACKAGE_NAME:-}" ] && [ -f android/app/src/main/AndroidManifest.xml ]; then
               PACKAGE_NAME=$(grep -oP 'package="[^"]+"' android/app/src/main/AndroidManifest.xml | head -1 | cut -d'"' -f2 || true)
             fi
@@ -42,9 +70,23 @@ jobs:
             echo "Detected package: ${PACKAGE_NAME:-not-found}"
 
             if [ -n "${PACKAGE_NAME:-}" ]; then
-              grep -q 'namespace ' android/app/build.gradle || \
-                sed -i "/android[[:space:]]*{/a\\    namespace \"$PACKAGE_NAME\"" android/app/build.gradle
+              if [[ "$APP_GRADLE" == *.kts ]]; then
+                if grep -q 'namespace *= *".*"' "$APP_GRADLE"; then
+                  sed -i "s/namespace *= *\".*\"/namespace = \"$PACKAGE_NAME\"/g" "$APP_GRADLE"
+                elif ! grep -q 'namespace' "$APP_GRADLE"; then
+                  sed -i "/android[[:space:]]*{/a\\    namespace = \"$PACKAGE_NAME\"" "$APP_GRADLE"
+                fi
+              else
+                if grep -q 'namespace ".*"' "$APP_GRADLE"; then
+                  sed -i "s/namespace \".*\"/namespace \"$PACKAGE_NAME\"/g" "$APP_GRADLE"
+                elif ! grep -q 'namespace' "$APP_GRADLE"; then
+                  sed -i "/android[[:space:]]*{/a\\    namespace \"$PACKAGE_NAME\"" "$APP_GRADLE"
+                fi
+              fi
             fi
+
+            echo "=== Android block preview ==="
+            grep -n -A 20 'android[[:space:]]*{' "$APP_GRADLE" || true
           fi
 
       - name: Flutter clean
@@ -57,10 +99,11 @@ jobs:
         run: flutter build apk --release --verbose
 
       - name: APK ফাইল দেখুন
-        run: ls -R build/app/outputs/flutter-apk/
+        run: ls -R build/app/outputs/flutter-apk/ || true
 
       - name: APK আপলোড
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
           path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error

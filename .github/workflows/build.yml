@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout কোড
+        uses: actions/checkout@v4
 
       - name: Java 17 সেটআপ
         uses: actions/setup-java@v4
@@ -29,12 +30,9 @@ jobs:
         run: flutter pub get
 
       - name: Debug APK বিল্ড
-        run: |
-          flutter clean
-          flutter pub get
-          flutter build apk --debug --no-shrink --verbose
+        run: flutter build apk --debug --verbose
 
-      - name: APK আপলোড (যাতে দেখা যায় APK তৈরি হয়েছে কি না)
+      - name: APK ফাইলটি সেভ করো (Artifact)
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk

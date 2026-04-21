@@ -1,13 +1,30 @@
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
+android {
+    namespace "com.walious.ultra"
+    compileSdk 34
+    ndkVersion "25.1.8937393"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17  ← 11 থেকে 17
+        targetCompatibility JavaVersion.VERSION_17  ← 11 থেকে 17
     }
-}
-rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
+
+    kotlinOptions {
+        jvmTarget = '17'  ← '11' থেকে '17'
+    }
+
+    defaultConfig {
+        applicationId "com.walious.ultra"
+        minSdk 21
+        targetSdk 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    buildTypes {
+        release {
+            // signingConfig লাইন পুরা ডিলিট করে দাও
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
 }

@@ -1,22 +1,5 @@
-name: walious_ultra
-description: Camera App with Ads
-version: 1.0.0+1
-publish_to: 'none'
-
-environment:
-  sdk: ^3.5.3
-
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  camera: ^0.10.5+9
-  # google_mobile_ads: ^5.3.1  <- AdMob বাদ, APK টেস্টের জন্য
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
-
-flutter:
-  uses-material-design: true
+  google_mobile_ads: ^5.1.0  # 👈 এই লাইনটা নতুন অ্যাড করো

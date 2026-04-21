@@ -26,3 +26,14 @@ jobs:
 
       - name: Flutter ক্লিন এবং APK বিল্ড (AGP + Namespace + Auto Package Fix)
         run: |
+          echo "=== লেভেল ১: গ্রাডেল ফাইল ক্লিনআপ ==="
+          sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
+          
+          echo "=== লেভেল ২: AGP ভার্সন মাস্টার ফিক্স ==="
+          # settings.gradle এ application + library দুইটাই ফোর্স করা
+          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' {} +
+          find android/ -name "settings.gradle*" -exec sed -i 's/id "com.android.library" version ".*"/id "com.android.library" version "8.3.0"/g' {} +
+          
+          # রুট build.gradle ফিক্স
+          if [ -f android/build.gradle ]; then
+            sed -i 's/com.android.tools.build:gradle:.*

@@ -46,7 +46,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: Play Store এ দিতে signingConfig চেঞ্জ করো
             signingConfig signingConfigs.debug
             minifyEnabled false
         }
@@ -58,4 +57,5 @@ flutter {
 }
 
 dependencies {
+    // খালি রাখো। Flutter প্লাগিন kotlin-stdlib অটো অ্যাড করে
 }

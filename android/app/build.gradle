@@ -45,13 +45,12 @@ android {
     }
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.debug
-            minifyEnabled false
-        }
+    release {
+        // signingConfig signingConfigs.debug  ← কমেন্ট করে দাও বা ডিলিট করো
+        minifyEnabled false
+        shrinkResources false
     }
 }
-
 flutter {
     source '../..'
 }

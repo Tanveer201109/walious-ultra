@@ -50,3 +50,11 @@ android {
             minifyEnabled false
         }
     }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+}

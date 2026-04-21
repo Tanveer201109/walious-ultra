@@ -1,4 +1,4 @@
-package com.example.walious_ultra
+package com.walious.ultra
 
 import io.flutter.embedding.android.FlutterActivity
 

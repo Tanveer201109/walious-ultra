@@ -55,6 +55,16 @@ jobs:
           fi
 
           if [ -n "$APP_GRADLE" ]; then
+            # compileSdk 34 force - AGP 8.3.0 compatibility
+            if [[ "$APP_GRADLE" == *.kts ]]; then
+              sed -i -E 's/compileSdkVersion\s*\([0-9]+\)/compileSdk = 34/g' "$APP_GRADLE" || true
+              sed -i -E 's/compileSdkVersion\s+[0-9]+/compileSdk = 34/g' "$APP_GRADLE" || true
+              sed -i -E 's/compileSdk\s*=\s*[0-9]+/compileSdk = 34/g' "$APP_GRADLE" || true
+            else
+              sed -i -E 's/compileSdkVersion\s+[0-9]+/compileSdkVersion 34/g' "$APP_GRADLE" || true
+              sed -i -E 's/compileSdk\s+[0-9]+/compileSdk 34/g' "$APP_GRADLE" || true
+            fi
+
             PACKAGE_NAME=$(grep -oP 'applicationId\s*[= ]\s*"[^"]+"' "$APP_GRADLE" | head -1 | cut -d'"' -f2 || true)
 
             if [ -z "${PACKAGE_NAME:-}" ] && [ -f android/app/src/main/AndroidManifest.xml ]; then
@@ -84,7 +94,7 @@ jobs:
         run: flutter pub get
 
       - name: APK বিল্ড
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: APK আপলোড
         uses: actions/upload-artifact@v4

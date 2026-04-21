@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "org.jetbrains.kotlin.android"
+    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -25,7 +25,6 @@ if (flutterVersionName == null) {
 android {
     namespace "com.example.walious_ultra"
     compileSdk 34
-    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -46,7 +45,8 @@ android {
 
     buildTypes {
         release {
-            // signingConfig লাইন কাটা হইছে
+            // TODO: Add your own signing config for the release build.
+            // signingConfig signingConfigs.release
         }
     }
 }
@@ -55,4 +55,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"  // যদি দরকার হয় পরে যোগ করা যাবে
+}

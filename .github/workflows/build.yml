@@ -3,13 +3,11 @@ name: Build Flutter APK
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout কোড
         uses: actions/checkout@v4
@@ -29,15 +27,16 @@ jobs:
       - name: Dependencies ইনস্টল
         run: flutter pub get
 
-      - name: Flutter দিয়ে APK বিল্ড (The Ultimate Fix)
+      - name: সরাসরি Flutter দিয়ে APK বিল্ড (Victory Step)
         run: |
-          echo "=== লেভেল ১: ব্যাকস্ল্যাশ ক্লিনআপ সার্জারি ==="
+          echo "=== ব্যাকস্ল্যাশ পরিষ্কার করা ==="
           sed -i 's/https\\:\/\//https:\/\//g' android/gradle/wrapper/gradle-wrapper.properties
-          echo "=== ক্লিনআপ শেষ, ফাইল চেক ==="
+          
+          echo "=== ক্লিনআপ ভেরিফাই করা ==="
           cat android/gradle/wrapper/gradle-wrapper.properties
           
-          echo "=== লেভেল ২: ফ্লাটার বিল্ড শুরু (এটি ২-৫ মিনিট সময় নেবে) ==="
-          flutter build apk --debug --verbose
+          echo "=== ফ্লাটার বিল্ড শুরু (এটি ২-৫ মিনিট সময় নেবে) ==="
+          flutter build apk --debug
           
       - name: APK আপলোড
         uses: actions/upload-artifact@v4

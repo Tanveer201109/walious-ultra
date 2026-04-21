@@ -29,13 +29,8 @@ jobs:
       - name: Dependencies ইনস্টল
         run: flutter pub get
 
-      - name: Gradle দিয়ে APK বিল্ড + লজ দেখা
-        run: |
-          flutter clean
-          cd android
-          chmod +x ./gradlew
-          ./gradlew assembleDebug --stacktrace --info
-          cd ..
+      - name: Debug APK বিল্ড
+        run: flutter build apk --debug --verbose
 
       - name: APK ফাইল চেক
         run: ls -R build/app/outputs/flutter-apk/
@@ -45,5 +40,5 @@ jobs:
         if: always()
         with:
           name: debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: warn
+          path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error

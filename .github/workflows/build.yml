@@ -25,19 +25,18 @@ jobs:
           flutter-version: '3.24.x'
           channel: 'stable'
 
-      - name: Flutter Dependencies ইনস্টল করা
-        run: flutter pub get
-
       - name: Debug APK বিল্ড করা
         run: |
           flutter clean
           flutter pub get
+          flutter build apk --debug --config-only
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace --info
+          ls -R app/build/outputs/
 
       - name: APK আপলোড করা
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: android/app/build/outputs/apk/debug/
+          path: android/app/build/outputs/**/*.apk

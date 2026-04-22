@@ -147,7 +147,7 @@ class HomeScreen extends StatelessWidget {
     return const Scaffold(
       body: Center(
         child: Text(
-          'ZAI Mail Home - Login UI নেক্সট',
+          'ZAI Mail Home - Login UI Next',
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
       ),

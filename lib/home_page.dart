@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -37,7 +40,7 @@ class HomePage extends StatelessWidget {
 
               // Google Button
               ElevatedButton.icon(
-                onPressed: () => _showSnack(context, 'Google Sign In'),
+                onPressed: () => _handleGoogleSignIn(context),
                 icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
                 label: const Text('Continue with Google'),
                 style: ElevatedButton.styleFrom(
@@ -53,7 +56,7 @@ class HomePage extends StatelessWidget {
 
               // Facebook Button
               ElevatedButton.icon(
-                onPressed: () => _showSnack(context, 'Facebook Sign In'),
+                onPressed: () => _handleFacebookSignIn(context),
                 icon: const Icon(Icons.facebook, color: Colors.white),
                 label: const Text('Continue with Facebook'),
                 style: ElevatedButton.styleFrom(
@@ -69,7 +72,7 @@ class HomePage extends StatelessWidget {
 
               // ZAI MAIL Create Button
               OutlinedButton.icon(
-                onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'),
+                onPressed: () => _handleZaiMailCreate(context),
                 icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
                 label: const Text('Create ZAI MAIL Account'),
                 style: OutlinedButton.styleFrom(
@@ -96,7 +99,7 @@ class HomePage extends StatelessWidget {
 
               // Login Button
               ElevatedButton(
-                onPressed: () => _showSnack(context, 'Login'),
+                onPressed: () => _handleLogin(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00FF88),
                   foregroundColor: Colors.black,
@@ -120,7 +123,67 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  // Google Sign In
+  Future<void> _handleGoogleSignIn(BuildContext context) async {
+    try {
+      _showSnack(context, 'Signing in with Google...');
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return; // User canceled
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      _showSnack(context, 'Google Sign In Success');
+      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DashboardPage()));
+    } catch (e) {
+      _showSnack(context, 'Google Sign In Failed: $e');
+    }
+  }
+
+  // Facebook Sign In - Meta SDK
+  Future<void> _handleFacebookSignIn(BuildContext context) async {
+    try {
+      _showSnack(context, 'Signing in with Facebook...');
+      final LoginResult result = await FacebookAuth.instance.login();
+
+      if (result.status == LoginStatus.success) {
+        final AccessToken accessToken = result.accessToken!;
+        final OAuthCredential credential = FacebookAuthProvider.credential(accessToken.tokenString);
+        
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        _showSnack(context, 'Facebook Sign In Success');
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DashboardPage()));
+      } else {
+        _showSnack(context, 'Facebook Sign In Cancelled');
+      }
+    } catch (e) {
+      _showSnack(context, 'Facebook Sign In Failed: $e');
+    }
+  }
+
+  // ZAI MAIL Create
+  void _handleZaiMailCreate(BuildContext context) {
+    _showSnack(context, 'Opening Register Page...');
+    // Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage()));
+  }
+
+  // Login
+  void _handleLogin(BuildContext context) {
+    _showSnack(context, 'Opening Login Page...');
+    // Navigator.push(context, MaterialPageRoute(builder: (_) => LoginPage()));
+  }
+
   void _showSnack(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
   }
 }

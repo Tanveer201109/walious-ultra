@@ -25,7 +25,7 @@ jobs:
         run: rm -rf android/
 
       - name: Create new Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail.
+        run: flutter create --org com.zaimail --project-name zai_mail . --overwrite
 
       - name: Write ZAI MAIL main.dart
         run: |
@@ -148,11 +148,11 @@ jobs:
             @override
             void paint(Canvas canvas, Size size) {
               final paint = Paint()
-            ..color = const Color(0xFF00FF88).withOpacity(0.8 + value * 0.2)
-            ..strokeWidth = 4
-            ..strokeCap = StrokeCap.round
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
-            ..style = PaintingStyle.fill;
+           ..color = const Color(0xFF00FF88).withOpacity(0.8 + value * 0.2)
+           ..strokeWidth = 4
+           ..strokeCap = StrokeCap.round
+           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
+           ..style = PaintingStyle.fill;
 
               final path = Path();
               final center = Offset(size.width / 2, size.height / 2);
@@ -168,8 +168,8 @@ jobs:
               canvas.drawPath(path, paint);
 
               final glowPaint = Paint()
-            ..color = const Color(0xFF00FF88).withOpacity(0.3)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
+           ..color = const Color(0xFF00FF88).withOpacity(0.3)
+           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
               canvas.drawPath(path, glowPaint);
             }
 
@@ -217,8 +217,6 @@ jobs:
                           style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5)),
                         ),
                         const SizedBox(height: 50),
-
-                        // Google Button
                         ElevatedButton.icon(
                           onPressed: () => _showSnack(context, 'Google Sign In'),
                           icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
@@ -231,90 +229,7 @@ jobs:
                           ),
                         ),
                         const SizedBox(height: 12),
-
-                        // Facebook Button
                         ElevatedButton.icon(
                           onPressed: () => _showSnack(context, 'Facebook Sign In'),
                           icon: const Icon(Icons.facebook, color: Colors.white),
-                          label: const Text('Continue with Facebook'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1877F2),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Create ZAI MAIL Button
-                        OutlinedButton.icon(
-                          onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'),
-                          icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
-                          label: const Text('Create ZAI MAIL Account'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF00FF88),
-                            side: const BorderSide(color: Color(0xFF00FF88), width: 2),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4))),
-                            ),
-                            Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Login Button
-                        ElevatedButton(
-                          onPressed: () => _showSnack(context, 'LOG IN'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00FF88),
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text(
-                            'LOG IN',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2),
-                          ),
-                        ),
-
-                        const SizedBox(height: 40),
-                        Text(
-                          'Powered by Meta',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3)),
-                        ),
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-
-            void _showSnack(BuildContext context, String msg) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-            }
-          }
-          EOF
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ZAI-MAIL-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+                          label: const

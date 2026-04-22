@@ -1,158 +1,137 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
+name: ZAI Mail APK Builder
 
-void main() {
-  runApp(const ZAiMailApp());
-}
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
 
-class ZAiMailApp extends StatelessWidget {
-  const ZAiMailApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-      ),
-      home: const SplashScreen(),
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
-  late AnimationController _ringController;
-  late AnimationController _flashController;
-  late Animation<double> _scale;
-  late Animation<double> _flash;
-  late Animation<double> _glow;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _ringController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-    _flashController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-
-    _scale = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _ringController, curve: Curves.elasticOut),
-    );
-    _flash = Tween<double>(begin: 0.0, end: 1.0).animate(_flashController);
-    _glow = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _ringController,
-        curve: const Interval(0.7, 1.0, curve: Curves.easeIn),
-      ),
-    );
-
-    _startAnim();
-  }
-
-  void _startAnim() async {
-    await _ringController.forward();
-    await _flashController.forward();
-    await _flashController.reverse();
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _ringController.dispose();
-    _flashController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Smoke animation - from right side
-          Positioned(
-            right: -150,
-            top: -100,
-            bottom: -100,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0.8, 0),
-                  radius: 1.0,
-                  colors: [
-                    Colors.white.withOpacity(0.12),
-                    Colors.white.withOpacity(0.04),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Center + Ring effect
-          Center(
-            child: AnimatedBuilder(
-              animation: Listenable.merge([_ringController, _flashController]),
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _scale.value,
-                  child: Container(
-                    width: 280,
-                    height: 280,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFFD700).withOpacity(0.5 * _glow.value),
-                          blurRadius: 80 * _glow.value,
-                          spreadRadius: 10 * _glow.value,
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+          
+      - name: Fix Gradle Project # এই স্টেপটা নতুন
+        run: flutter create --platforms=android --project-name zai_mail .
+          
+      - name: Create main.dart - Ring Glow + Lightning
+        run: |
+          mkdir -p lib
+          cat > lib/main.dart << 'EOF'
+          import 'package:flutter/material.dart';
+          import 'dart:async';
+          import 'dart:math';
+          void main() { runApp(const ZAiMailApp()); }
+          class ZAiMailApp extends StatelessWidget {
+            const ZAiMailApp({super.key});
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF0A0A0A)),
+                home: const SplashScreen(),
+              );
+            }
+          }
+          class SplashScreen extends StatefulWidget {
+            const SplashScreen({super.key});
+            @override
+            State<SplashScreen> createState() => _SplashScreenState();
+          }
+          class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+            late AnimationController _ringController, _flashController, _scaleController;
+            late Animation<double> _ringGlow, _flash, _scale;
+            final Random _random = Random();
+            @override
+            void initState() {
+              super.initState();
+              _ringController = AnimationController(duration: const Duration(seconds: 2), vsync: this)..repeat(reverse: true);
+              _flashController = AnimationController(duration: const Duration(milliseconds: 100), vsync: this);
+              _scaleController = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
+              _ringGlow = Tween<double>(begin: 0.4, end: 1.0).animate(CurvedAnimation(parent: _ringController, curve: Curves.easeInOut));
+              _flash = Tween<double>(begin: 0.0, end: 1.0).animate(_flashController);
+              _scale = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut));
+              _startSequence();
+            }
+            void _startSequence() async {
+              await _scaleController.forward();
+              _lightningLoop();
+              await Future.delayed(const Duration(seconds: 4));
+              if (mounted) { Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen())); }
+            }
+            void _lightningLoop() async {
+              while(mounted) {
+                await Future.delayed(Duration(milliseconds: 600 + _random.nextInt(2500)));
+                if (!mounted) break;
+                await _flashController.forward();
+                await _flashController.reverse();
+              }
+            }
+            @override
+            void dispose() { _ringController.dispose(); _flashController.dispose(); _scaleController.dispose(); super.dispose(); }
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                backgroundColor: const Color(0xFF0A0A0A),
+                body: Center(
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([_ringController, _flashController, _scaleController]),
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _scale.value,
+                        child: Container(
+                          width: 300, height: 300,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: const Color(0xFFFFD700).withOpacity(0.7 * _ringGlow.value), blurRadius: 50 * _ringGlow.value, spreadRadius: 8 * _ringGlow.value),
+                              BoxShadow(color: Colors.white.withOpacity(1.0 * _flash.value), blurRadius: 120 * _flash.value, spreadRadius: 25 * _flash.value),
+                            ],
+                          ),
+                          child: Image.asset('assets/logo.png'),
                         ),
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.9 * _flash.value),
-                          blurRadius: 60 * _flash.value,
-                          spreadRadius: 30 * _flash.value,
-                        ),
-                      ],
-                    ),
-                    child: Image.asset('assets/logo.png'),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          'ZAI Mail Home - Login UI Next',
-          style: TextStyle(fontSize: 20, color: Colors.white),
-        ),
-      ),
-    );
-  }
-}
+                ),
+              );
+            }
+          }
+          class HomeScreen extends StatelessWidget {
+            const HomeScreen({super.key});
+            @override
+            Widget build(BuildContext context) {
+              return const Scaffold(backgroundColor: Color(0xFF0A0A0A), body: Center(child: Text('ZAI Mail Home', style: TextStyle(fontSize: 24, color: Colors.white))));
+            }
+          }
+          EOF
+          
+      - name: Fix pubspec.yaml
+        run: |
+          sed -i "s/sdk: '>=3.0.0 <4.0.0'/sdk: '>=3.5.0 <4.0.0'/" pubspec.yaml
+          if ! grep -q "assets/logo.png" pubspec.yaml; then
+            sed -i '/flutter:/a \  assets:\n    - assets/logo.png' pubspec.yaml
+          fi
+          
+      - name: Get packages
+        run: flutter pub get
+        
+      - name: Build APK
+        run: flutter build apk --release
+        
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: zai-mail-apk
+          path: build/app/outputs/flutter-apk/app-release.apk

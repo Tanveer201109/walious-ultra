@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'ring_painter.dart';
+import 'lightning_painter.dart';
+import 'home_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,19 +21,16 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     
-    // গোল্ডেন রিং ঘুরবে
     _ringController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
     )..repeat();
 
-    // হ্যালো পালস
     _haloController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2500),
     )..repeat(reverse: true);
 
-    // বিজলি ফ্ল্যাশ
     _flashController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 120),
@@ -38,16 +38,20 @@ class _SplashScreenState extends State<SplashScreen>
 
     _startLightningLoop();
     
-    // 4 সেকেন্ড পর হোমে যাবে
     Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) Navigator.pushReplacementNamed(context, '/home');
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
     });
   }
 
   void _startLightningLoop() async {
     await Future.delayed(const Duration(milliseconds: 600));
     while (mounted) {
-      int burstSize = _random.nextInt(3) + 2; // 2-4 টা ফ্ল্যাশ
+      int burstSize = _random.nextInt(3) + 2;
       for (int i = 0; i < burstSize; i++) {
         if (!mounted) return;
         _flashController.forward(from: 0);
@@ -76,14 +80,12 @@ class _SplashScreenState extends State<SplashScreen>
         builder: (context, child) {
           return Stack(
             children: [
-              // স্ক্রিন ফ্ল্যাশ ওভারলে
               if (_flashController.value > 0)
                 Container(
                   color: const Color(0xFFB4DCFF)
-                     .withOpacity(0.18 * _flashController.value),
+                  .withOpacity(0.18 * _flashController.value),
                 ),
               
-              // মেইন সিন
               Center(
                 child: SizedBox(
                   width: 320,
@@ -91,7 +93,6 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Halo
                       ScaleTransition(
                         scale: Tween(begin: 1.0, end: 1.15).animate(
                           CurvedAnimation(
@@ -111,47 +112,13 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                       ),
-
-                      // Golden Ring
                       RotationTransition(
                         turns: _ringController,
-                        child: Container(
-                          width: 280,
-                          height: 280,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const SweepGradient(
-                              colors: [
-                                Color(0xFFD4AF37), Color(0xFFFFF8DC),
-                                Color(0xFFD4AF37), Color(0xFFA07820),
-                                Color(0xFFD4AF37), Color(0xFFFFF8DC),
-                                Color(0xFFD4AF37),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFD4AF37).withOpacity(0.5),
-                                blurRadius: 20,
-                                spreadRadius: 5,
-                              ),
-                              BoxShadow(
-                                color: const Color(0xFFD4AF37).withOpacity(0.2),
-                                blurRadius: 50,
-                                spreadRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.all(2.5),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFF080808),
-                            ),
-                          ),
+                        child: CustomPaint(
+                          size: const Size(280, 280),
+                          painter: RingPainter(),
                         ),
                       ),
-
-                      // Lightning Canvas
                       ClipOval(
                         child: SizedBox(
                           width: 274,
@@ -162,8 +129,6 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                       ),
-
-                      // Logo Text
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -181,7 +146,7 @@ class _SplashScreenState extends State<SplashScreen>
                                         shadows: [
                                           Shadow(
                                               color: Colors.grey
-                                                 .withOpacity(0.6),
+                                              .withOpacity(0.6),
                                               blurRadius: 20)
                                         ])),
                                 const TextSpan(
@@ -226,7 +191,7 @@ class _SplashScreenState extends State<SplashScreen>
                                         shadows: [
                                           Shadow(
                                               color: Colors.grey
-                                                 .withOpacity(0.6),
+                                              .withOpacity(0.6),
                                               blurRadius: 20)
                                         ])),
                               ],
@@ -243,7 +208,7 @@ class _SplashScreenState extends State<SplashScreen>
                               shadows: [
                                 Shadow(
                                     color: const Color(0xFFD4AF37)
-                                       .withOpacity(0.5),
+                                    .withOpacity(0.5),
                                     blurRadius: 10)
                               ],
                             ),
@@ -260,57 +225,4 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
-
-// বিজলি আঁকার ক্লাস
-class LightningPainter extends CustomPainter {
-  final double flashValue;
-  final Random random;
-  LightningPainter(this.flashValue, this.random);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (flashValue < 0.1) return;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final paint = Paint()
-     ..color = const Color(0xFFC8E6FF).withOpacity(flashValue)
-     ..strokeWidth = 1.5
-     ..style = PaintingStyle.stroke
-     ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-
-    final glowPaint = Paint()
-     ..color = const Color(0xFF96C8FF).withOpacity(flashValue * 0.35)
-     ..strokeWidth = 6
-     ..style = PaintingStyle.stroke
-     ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-
-    int bolts = random.nextInt(3) + 2;
-    for (int i = 0; i < bolts; i++) {
-      double angle = random.nextDouble() * 2 * pi;
-      double r = size.width / 2 * (0.7 + random.nextDouble() * 0.25);
-      Offset start = Offset(center.dx + r * cos(angle),
-          center.dy + r * sin(angle));
-      Offset end = Offset(center.dx + random.nextDouble() * 80 - 40,
-          center.dy + random.nextDouble() * 80 - 40);
-      
-      _drawBolt(canvas, glowPaint, start, end, 8);
-      _drawBolt(canvas, paint, start, end, 8);
-    }
-  }
-
-  void _drawBolt(Canvas canvas, Paint paint, Offset p1, Offset p2, int depth) {
-    if (depth == 0) {
-      canvas.drawLine(p1, p2, paint);
-      return;
-    }
-    double mx = (p1.dx + p2.dx) / 2 + random.nextDouble() * 50 - 25;
-    double my = (p1.dy + p2.dy) / 2 + random.nextDouble() * 50 - 25;
-    Offset mid = Offset(mx, my);
-    _drawBolt(canvas, paint, p1, mid, depth - 1);
-    _drawBolt(canvas, paint, mid, p2, depth - 1);
-  }
-
-  @override
-  bool shouldRepaint(covariant LightningPainter oldDelegate) => true;
 }

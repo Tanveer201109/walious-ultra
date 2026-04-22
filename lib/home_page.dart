@@ -6,52 +6,150 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
-      appBar: AppBar(
-        title: const Text(
-          '[zAi] Mail',
-          style: TextStyle(
-            fontFamily: 'Georgia',
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFD4AF37),
+      backgroundColor: const Color(0xFF0A0A0A),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Logo
+              const Icon(Icons.mail_outline, size: 80, color: Color(0xFF00FF88)),
+              const SizedBox(height: 24),
+              const Text(
+                'ZAI MAIL',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 4,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Secure. Fast. Simple.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5)),
+              ),
+              const SizedBox(height: 50),
+
+              // Google Login Button
+              ElevatedButton.icon(
+                onPressed: () => _handleGoogleSignIn(context),
+                icon: Image.asset(
+                  'assets/google.png', // তুমি assets ফোল্ডারে google.png রাখবা
+                  height: 24,
+                  width: 24,
+                  errorBuilder: (context, error, stackTrace) => 
+                    const Icon(Icons.g_mobiledata, color: Colors.black),
+                ),
+                label: const Text('Continue with Google'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Facebook Login Button
+              ElevatedButton.icon(
+                onPressed: () => _handleFacebookSignIn(context),
+                icon: const Icon(Icons.facebook, color: Colors.white),
+                label: const Text('Continue with Facebook'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1877F2),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Create ZAI MAIL Button
+              OutlinedButton.icon(
+                onPressed: () => _handleZaiMailCreate(context),
+                icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
+                label: const Text('Create ZAI MAIL Account'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF00FF88),
+                  side: const BorderSide(color: Color(0xFF00FF88), width: 2),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4))),
+                  ),
+                  Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Login Button
+              ElevatedButton(
+                onPressed: () => _handleLogin(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00FF88),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  'LOG IN',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+              Text(
+                'Powered by Meta',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3)),
+              ),
+            ],
           ),
         ),
-        backgroundColor: const Color(0xFF0A0A0A),
-        elevation: 0,
-        centerTitle: true,
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Welcome to ZAI Mail',
-              style: TextStyle(
-                fontSize: 28,
-                color: Color(0xFFD4AF37),
-                fontFamily: 'Georgia',
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'THE FAITH STANDARD',
-              style: TextStyle(
-                fontSize: 12,
-                letterSpacing: 4,
-                color: Color(0xFFC8C8C8),
-              ),
-            ),
-            SizedBox(height: 40),
-            Text(
-              'Inbox Coming Soon...',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white54,
-              ),
-            ),
-          ],
-        ),
-      ),
+    );
+  }
+
+  void _handleGoogleSignIn(BuildContext context) {
+    // TODO: Google Sign In Logic লাগবে
+    // Package: google_sign_in: ^6.2.1
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Google Sign In - Firebase লাগবে')),
+    );
+  }
+
+  void _handleFacebookSignIn(BuildContext context) {
+    // TODO: Facebook Login Logic লাগবে
+    // Package: flutter_facebook_auth: ^7.0.1
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Facebook Sign In - Facebook SDK লাগবে')),
+    );
+  }
+
+  void _handleZaiMailCreate(BuildContext context) {
+    // TODO: নিজস্ব Mail Create পেজে নিয়ে যাও
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Create ZAI MAIL - Register পেজ বানাও')),
+    );
+  }
+
+  void _handleLogin(BuildContext context) {
+    // TODO: Login পেজে নিয়ে যাও
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Login - Email/Password পেজ বানাও')),
     );
   }
 }

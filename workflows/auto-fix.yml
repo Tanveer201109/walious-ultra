@@ -1,0 +1,22 @@
+name: ZAI Auto Fixer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  auto-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create assets folder and logo
+        run: |
+          mkdir -p assets
+          if [ ! -f assets/logo.png ]; then
+            echo "iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAYAAADHos5ZAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAvNSURBVHja7d3tUuS6GuahbWJd3W7dW7b3d3d3d3d3d3d3d3d3d3d3d

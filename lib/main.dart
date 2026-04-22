@@ -1,42 +1,41 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'ring_painter.dart';
-import 'lightning_painter.dart';
-import 'home_page.dart';
+import 'dart:math' as math;
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class RingPainter extends CustomPainter {
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _ringController;
-  late AnimationController _haloController;
-  late AnimationController _flashController;
-  final Random _random = Random();
-
-  @override
-  void initState() {
-    super.initState();
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    final strokeWidth = 6.0;
     
-    _ringController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
+    final paint = Paint()
+     ..shader = const LinearGradient(
+        colors: [
+          Color(0xFFFFD700),
+          Color(0xFFD4AF37),
+          Color(0xFFFFD700),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromCircle(center: center, radius: radius))
+     ..style = PaintingStyle.stroke
+     ..strokeWidth = strokeWidth
+     ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 3);
 
-    _haloController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2500),
-    )..repeat(reverse: true);
+    canvas.drawCircle(center, radius, paint);
 
-    _flashController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 120),
-    );
+    final innerPaint = Paint()
+     ..color = const Color(0xFFFFD700).withOpacity(0.3)
+     ..style = PaintingStyle.stroke
+     ..strokeWidth = 1.5;
+    
+    canvas.drawCircle(center, radius - 10, innerPaint);
+    canvas.drawCircle(center, radius + 10, innerPaint);
+  }
 
-    _startLightningLoop();
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
     
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {

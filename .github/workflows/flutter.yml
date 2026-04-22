@@ -1,4 +1,4 @@
-name: ZAI Mail APK Build
+name: Build APK
 on:
   push:
     branches: [ main ]
@@ -16,10 +16,9 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
-          cache: true
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
-          name: 18-ULTRA-AI-release
+          name: 18-ULTRA-AI
           path: build/app/outputs/flutter-apk/app-release.apk

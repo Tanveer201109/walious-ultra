@@ -1,4 +1,4 @@
-name: ZAI Mail APK Builder
+name: ZAI Mail APK Builder Final
 
 on:
   workflow_dispatch:
@@ -9,22 +9,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-java@v4
+      - name: 1. Checkout code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
-          
-      - uses: subosito/flutter-action@v2
+
+      - name: 3. Setup Flutter 3.24.0
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0' # Dart 3.5+ ফিক্স
+          flutter-version: '3.24.0'
           channel: 'stable'
           cache: true
-          
-      - name: Create main.dart - Ring Glow + Lightning
+
+      - name: 4. Create Full Flutter Project Structure
         run: |
-          mkdir -p lib
+          # এই কমান্ড android/, ios/, pubspec.yaml সব নতুন করে বানাবে
+          # তোমার পুরান ফাইল নষ্ট হবে না
+          flutter create --platforms=android --project-name zai_mail --org com.tanveer .
+          
+      - name: 5. Create Ring Glow + Lightning main.dart
+        run: |
+          mkdir -p lib assets
           cat > lib/main.dart << 'EOF'
           import 'package:flutter/material.dart';
           import 'dart:async';
@@ -113,23 +122,29 @@ jobs:
             }
           }
           EOF
-          
-      - name: Fix pubspec.yaml
+
+      - name: 6. Fix pubspec.yaml for SDK + Assets
         run: |
-          # SDK ভার্সন ফিক্স
-          sed -i "s/sdk: '>=3.0.0 <4.0.0'/sdk: '>=3.5.0 <4.0.0'/" pubspec.yaml
-          # assets অ্যাড
-          if ! grep -q "assets/logo.png" pubspec.yaml; then
-            sed -i '/flutter:/a \  assets:\n    - assets/logo.png' pubspec.yaml
+          # SDK ভার্সন 3.5.0 ফিক্স
+          sed -i "s/sdk: '>=3.*.* <4.0.0'/sdk: '>=3.5.0 <4.0.0'/" pubspec.yaml
+          # assets ফোল্ডার অ্যাড
+          if ! grep -q "assets:" pubspec.yaml; then
+            echo "" >> pubspec.yaml
+            echo "flutter:" >> pubspec.yaml
+            echo "  uses-material-design: true" >> pubspec.yaml
+            echo "  assets:" >> pubspec.yaml
+            echo "    - assets/logo.png" >> pubspec.yaml
+          elif ! grep -q "assets/logo.png" pubspec.yaml; then
+            sed -i '/assets:/a \    - assets/logo.png' pubspec.yaml
           fi
-          
-      - name: Get packages
+
+      - name: 7. Get packages
         run: flutter pub get
-        
-      - name: Build APK
+
+      - name: 8. Build APK
         run: flutter build apk --release
-        
-      - name: Upload APK
+
+      - name: 9. Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: zai-mail-apk

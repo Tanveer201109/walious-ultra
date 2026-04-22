@@ -14,8 +14,8 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo
-              const Icon(Icons.flash_on, size: 80, color: Color(0xFF00FF88)),
+              // সবুজ বিজলি আইকন
+              Icon(Icons.flash_on, size: 80, color: const Color(0xFF00FF88)),
               const SizedBox(height: 24),
               const Text(
                 'ZAI MAIL',
@@ -35,9 +35,9 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 50),
 
-              // Google Login Button
+              // Google Button
               ElevatedButton.icon(
-                onPressed: () => _handleGoogleSignIn(context),
+                onPressed: () => _showSnack(context, 'Google Sign In'),
                 icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
                 label: const Text('Continue with Google'),
                 style: ElevatedButton.styleFrom(
@@ -49,9 +49,9 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Facebook Login Button
+              // Facebook Button
               ElevatedButton.icon(
-                onPressed: () => _handleFacebookSignIn(context),
+                onPressed: () => _showSnack(context, 'Facebook Sign In'),
                 icon: const Icon(Icons.facebook, color: Colors.white),
                 label: const Text('Continue with Facebook'),
                 style: ElevatedButton.styleFrom(
@@ -63,9 +63,9 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Create ZAI MAIL Button
+              // ZAI MAIL Create Button
               OutlinedButton.icon(
-                onPressed: () => _handleZaiMailCreate(context),
+                onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'),
                 icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
                 label: const Text('Create ZAI MAIL Account'),
                 style: OutlinedButton.styleFrom(
@@ -91,7 +91,7 @@ class HomePage extends StatelessWidget {
 
               // Login Button
               ElevatedButton(
-                onPressed: () => _handleLogin(context),
+                onPressed: () => _showSnack(context, 'Login'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00FF88),
                   foregroundColor: Colors.black,
@@ -117,27 +117,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _handleGoogleSignIn(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Google Sign In - Firebase লাগবে')),
-    );
-  }
-
-  void _handleFacebookSignIn(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Facebook Sign In - Facebook SDK লাগবে')),
-    );
-  }
-
-  void _handleZaiMailCreate(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Create ZAI MAIL - Register পেজ বানাও')),
-    );
-  }
-
-  void _handleLogin(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Login - Email/Password পেজ বানাও')),
-    );
+  void _showSnack(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }

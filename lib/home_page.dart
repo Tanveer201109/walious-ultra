@@ -15,7 +15,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Logo
-              const Icon(Icons.mail_outline, size: 80, color: Color(0xFF00FF88)),
+              const Icon(Icons.flash_on, size: 80, color: Color(0xFF00FF88)),
               const SizedBox(height: 24),
               const Text(
                 'ZAI MAIL',
@@ -38,13 +38,7 @@ class HomePage extends StatelessWidget {
               // Google Login Button
               ElevatedButton.icon(
                 onPressed: () => _handleGoogleSignIn(context),
-                icon: Image.asset(
-                  'assets/google.png', // তুমি assets ফোল্ডারে google.png রাখবা
-                  height: 24,
-                  width: 24,
-                  errorBuilder: (context, error, stackTrace) => 
-                    const Icon(Icons.g_mobiledata, color: Colors.black),
-                ),
+                icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
                 label: const Text('Continue with Google'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -124,30 +118,24 @@ class HomePage extends StatelessWidget {
   }
 
   void _handleGoogleSignIn(BuildContext context) {
-    // TODO: Google Sign In Logic লাগবে
-    // Package: google_sign_in: ^6.2.1
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Google Sign In - Firebase লাগবে')),
     );
   }
 
   void _handleFacebookSignIn(BuildContext context) {
-    // TODO: Facebook Login Logic লাগবে
-    // Package: flutter_facebook_auth: ^7.0.1
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Facebook Sign In - Facebook SDK লাগবে')),
     );
   }
 
   void _handleZaiMailCreate(BuildContext context) {
-    // TODO: নিজস্ব Mail Create পেজে নিয়ে যাও
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Create ZAI MAIL - Register পেজ বানাও')),
     );
   }
 
   void _handleLogin(BuildContext context) {
-    // TODO: Login পেজে নিয়ে যাও
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Login - Email/Password পেজ বানাও')),
     );

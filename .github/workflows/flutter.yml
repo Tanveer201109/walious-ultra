@@ -51,7 +51,7 @@ jobs:
           }
           EOF
 
-      - name: Write splash_screen.dart
+      - name: Write splash_screen.dart - তোমার ছবির মতো
         run: |
           cat > lib/splash_screen.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -66,7 +66,7 @@ jobs:
             @override
             void initState() {
               super.initState();
-              _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150))..repeat(reverse: true);
+              _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
               Future.delayed(const Duration(seconds: 3), () {
                 if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
               });
@@ -80,30 +80,33 @@ jobs:
                 body: AnimatedBuilder(
                   animation: _controller,
                   builder: (context, child) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 200, height: 200,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(colors: [const Color(0xFF00FF88).withOpacity(0.15 + _controller.value * 0.1), Colors.transparent]),
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.6 + _controller.value * 0.1,
+                          colors: [const Color(0xFF00FF88).withOpacity(0.15 + _controller.value * 0.1), const Color(0xFF0A0A0A)],
+                          stops: const [0.0, 1.0],
+                        ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.flash_on, size: 60, color: const Color(0xFF00FF88), shadows: [Shadow(color: const Color(0xFF00FF88).withOpacity(0.8), blurRadius: 20 + _controller.value * 10)]),
+                            const SizedBox(height: 40),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Z', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: 20)),
+                                Text('A', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: 20)),
+                                Text('I', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white)),
+                              ],
                             ),
-                            child: CustomPaint(size: const Size(200, 200), painter: GreenLightningPainter(_controller.value)),
-                          ),
-                          const SizedBox(height: 40),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Z', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w300, color: Colors.white.withOpacity(0.9), letterSpacing: 12)),
-                              Text('A', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w300, color: Colors.white.withOpacity(0.9), letterSpacing: 12)),
-                              Text('I', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w300, color: Colors.white.withOpacity(0.9))),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text('MAIL', style: TextStyle(fontSize: 16, letterSpacing: 8, color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w300)),
-                        ],
+                            const SizedBox(height: 12),
+                            Text('M A I L', style: TextStyle(fontSize: 16, letterSpacing: 12, color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w300)),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -111,38 +114,9 @@ jobs:
               );
             }
           }
-          class GreenLightningPainter extends CustomPainter {
-            final double value;
-            GreenLightningPainter(this.value);
-            @override
-            void paint(Canvas canvas, Size size) {
-              final paint = Paint()
-         ..color = const Color(0xFF00FF88).withOpacity(0.8 + value * 0.2)
-         ..strokeWidth = 4
-         ..strokeCap = StrokeCap.round
-         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
-         ..style = PaintingStyle.fill;
-              final path = Path();
-              final center = Offset(size.width / 2, size.height / 2);
-              path.moveTo(center.dx, center.dy - 60);
-              path.lineTo(center.dx - 15, center.dy - 10);
-              path.lineTo(center.dx + 5, center.dy - 10);
-              path.lineTo(center.dx - 10, center.dy + 60);
-              path.lineTo(center.dx + 15, center.dy + 10);
-              path.lineTo(center.dx - 5, center.dy + 10);
-              path.close();
-              canvas.drawPath(path, paint);
-              final glowPaint = Paint()
-         ..color = const Color(0xFF00FF88).withOpacity(0.3)
-         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
-              canvas.drawPath(path, glowPaint);
-            }
-            @override
-            bool shouldRepaint(GreenLightningPainter oldDelegate) => true;
-          }
           EOF
 
-      - name: Write home_page.dart with 4 BUTTONS
+      - name: Write home_page.dart - 4টা বাটন সহ
         run: |
           cat > lib/home_page.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -164,56 +138,4 @@ jobs:
                         const SizedBox(height: 24),
                         const Text('ZAI MAIL', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
                         const SizedBox(height: 8),
-                        Text('Secure. Fast. Simple.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5))),
-                        const SizedBox(height: 50),
-                        ElevatedButton.icon(
-                          onPressed: () => _showSnack(context, 'Google Sign In'),
-                          icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
-                          label: const Text('Continue with Google'),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                        ),
-                        const SizedBox(height: 12),
-                        ElevatedButton.icon(
-                          onPressed: () => _showSnack(context, 'Facebook Sign In'),
-                          icon: const Icon(Icons.facebook, color: Colors.white),
-                          label: const Text('Continue with Facebook'),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1877F2), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                        ),
-                        const SizedBox(height: 12),
-                        OutlinedButton.icon(
-                          onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'),
-                          icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
-                          label: const Text('Create ZAI MAIL Account'),
-                          style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF00FF88), side: const BorderSide(color: Color(0xFF00FF88), width: 2), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                        ),
-                        const SizedBox(height: 24),
-                        Row(children: [Expanded(child: Divider(color: Colors.white.withOpacity(0.2))), Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4)))), Expanded(child: Divider(color: Colors.white.withOpacity(0.2)))]),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () => _showSnack(context, 'LOG IN'),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FF88), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                          child: const Text('LOG IN', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                        ),
-                        const SizedBox(height: 40),
-                        Text('Powered by Meta', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3))),
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-            void _showSnack(BuildContext context, String msg) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-            }
-          }
-          EOF
-
-      - run: flutter pub get
-      - run: flutter build apk --release
-
-      - name: Upload ZAI MAIL APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ZAI-MAIL-GREEN-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+                        Text('Secure. Fast. Simple.', textAlign: TextAlign.center

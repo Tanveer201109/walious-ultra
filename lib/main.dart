@@ -18,14 +18,10 @@ class ZaiMailApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF080808),
         fontFamily: 'Georgia',
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/home': (context) => const HomePage(),
-      },
+      home: const SplashScreen(),
     );
   }
-}
+ }
 
 // আপাতত ডামি হোম পেজ। পরে মেইল UI বসাবা
 class HomePage extends StatelessWidget {

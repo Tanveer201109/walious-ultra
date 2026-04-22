@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,5 +34,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: zai-mail-release
+          name: 18-ULTRA-AI-release
           path: build/app/outputs/flutter-apk/app-release.apk

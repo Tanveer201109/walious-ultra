@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                       ),
                     ),
                     Text(
-                      'আল্লাহ',
+                      'Tanveer ভাই',
                       style: TextStyle(
                         color: const Color(0xFF0081FB).withOpacity(0.6),
                         fontSize: 12,
@@ -150,31 +150,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                       blurRadius: 20)
                                 ])),
                         const TextSpan(
-                            text: 'z',
-                            style: TextStyle(
-                                fontSize: 44,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                      color: Colors.white,
-                                      blurRadius: 8)
-                                ])),
-                        const TextSpan(
-                            text: 'A',
+                            text: '১৮ ULTRA AI',
                             style: TextStyle(
                                 fontSize: 56,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                      color: Colors.white,
-                                      blurRadius: 8)
-                                ])),
-                        const TextSpan(
-                            text: 'i',
-                            style: TextStyle(
-                                fontSize: 48,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 shadows: [

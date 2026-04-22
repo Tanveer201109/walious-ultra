@@ -1,34 +1,36 @@
-name: Build ZAI MAIL APK
+name: ZAI MAIL Auto-Fix Bot
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
 jobs:
-  build:
+  auto-fix-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Flutter
+      - name: Setup Flutter 3.24
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Delete old Android folder
-        run: rm -rf android/
+      - name: 🔥 AUTO FIX 1 - Delete broken Android folder
+        run: rm -rf android/ ios/ linux/ macos/ windows/ web/
 
-      - name: Create new Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail . --overwrite
+      - name: 🔥 AUTO FIX 2 - Rebuild Flutter project
+        run: flutter create --org com.zaimail --project-name zai_mail. --overwrite
 
-      - name: Write ZAI MAIL main.dart
+      - name: 🔥 AUTO FIX 3 - Write lib/main.dart
         run: |
+          mkdir -p lib
           cat > lib/main.dart << 'EOF'
           import 'package:flutter/material.dart';
           import 'splash_screen.dart';
@@ -53,7 +55,7 @@ jobs:
           }
           EOF
 
-      - name: Write splash_screen.dart
+      - name: 🔥 AUTO FIX 4 - Write lib/splash_screen.dart
         run: |
           cat > lib/splash_screen.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -148,11 +150,11 @@ jobs:
             @override
             void paint(Canvas canvas, Size size) {
               final paint = Paint()
-           ..color = const Color(0xFF00FF88).withOpacity(0.8 + value * 0.2)
-           ..strokeWidth = 4
-           ..strokeCap = StrokeCap.round
-           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
-           ..style = PaintingStyle.fill;
+          ..color = const Color(0xFF00FF88).withOpacity(0.8 + value * 0.2)
+          ..strokeWidth = 4
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
+          ..style = PaintingStyle.fill;
 
               final path = Path();
               final center = Offset(size.width / 2, size.height / 2);
@@ -168,8 +170,8 @@ jobs:
               canvas.drawPath(path, paint);
 
               final glowPaint = Paint()
-           ..color = const Color(0xFF00FF88).withOpacity(0.3)
-           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
+          ..color = const Color(0xFF00FF88).withOpacity(0.3)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
               canvas.drawPath(path, glowPaint);
             }
 
@@ -178,7 +180,7 @@ jobs:
           }
           EOF
 
-      - name: Write home_page.dart
+      - name: 🔥 AUTO FIX 5 - Write lib/home_page.dart
         run: |
           cat > lib/home_page.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -232,4 +234,82 @@ jobs:
                         ElevatedButton.icon(
                           onPressed: () => _showSnack(context, 'Facebook Sign In'),
                           icon: const Icon(Icons.facebook, color: Colors.white),
-                          label: const
+                          label: const Text('Continue with Facebook'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1877F2),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'),
+                          icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
+                          label: const Text('Create ZAI MAIL Account'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF00FF88),
+                            side: const BorderSide(color: Color(0xFF00FF88), width: 2),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4))),
+                            ),
+                            Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => _showSnack(context, 'LOG IN'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00FF88),
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text(
+                            'LOG IN',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        Text(
+                          'Powered by Meta',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3)),
+                        ),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            void _showSnack(BuildContext context, String msg) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+            }
+          }
+          EOF
+
+      - name: 🔥 AUTO FIX 6 - Delete old conflicting files
+        run: rm -f lib/ring_painter.dart lib/lightning_painter.dart
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      - name: Upload ZAI MAIL APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZAI-MAIL-FIXED-APK
+          path: build/app/outputs/flutter-apk/app-release.apk

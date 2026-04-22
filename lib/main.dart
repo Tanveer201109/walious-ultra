@@ -86,6 +86,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     return Scaffold(
       body: Stack(
         children: [
+          // Smoke animation - from right side
           Positioned(
             right: -150,
             top: -100,
@@ -105,6 +106,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               ),
             ),
           ),
+          // Center + Ring effect
           Center(
             child: AnimatedBuilder(
               animation: Listenable.merge([_ringController, _flashController]),

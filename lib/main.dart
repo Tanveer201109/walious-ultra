@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     _flash = Tween<double>(begin: 0.0, end: 1.0).animate(_flashController);
     _glow = Tween<double>(begin: 0.3, end: 1.0).animate(
       CurvedAnimation(
-        parent: _ringController, 
+        parent: _ringController,
         curve: const Interval(0.7, 1.0, curve: Curves.easeIn),
       ),
     );
@@ -111,34 +111,27 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             child: AnimatedBuilder(
               animation: Listenable.merge([_ringController, _flashController]),
               builder: (context, child) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // গোল্ডেন গ্লো + স্কেল
-                    Transform.scale(
-                      scale: _scale.value,
-                      child: Container(
-                        width: 280,
-                        height: 280,
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFFFD700).withOpacity(0.5 * _glow.value),
-                              blurRadius: 80 * _glow.value,
-                              spreadRadius: 10 * _glow.value,
-                            ),
-                            // বিদ্যুতের সাদা ফ্ল্যাশ
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.9 * _flash.value),
-                              blurRadius: 60 * _flash.value,
-                              spreadRadius: 30 * _flash.value,
-                            ),
-                          ],
+                return Transform.scale(
+                  scale: _scale.value,
+                  child: Container(
+                    width: 280,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFD700).withOpacity(0.5 * _glow.value),
+                          blurRadius: 80 * _glow.value,
+                          spreadRadius: 10 * _glow.value,
                         ),
-                        child: Image.asset('assets/logo.png'),
-                      ),
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.9 * _flash.value),
+                          blurRadius: 60 * _flash.value,
+                          spreadRadius: 30 * _flash.value,
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Image.asset('assets/logo.png'),
+                  ),
                 );
               },
             ),

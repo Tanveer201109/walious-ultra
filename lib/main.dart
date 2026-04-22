@@ -33,7 +33,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late Animation<double> _scale;
   late Animation<double> _flash;
   late Animation<double> _glow;
-  late Animation<double> _rotation;
 
   @override
   void initState() {
@@ -57,9 +56,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         parent: _ringController,
         curve: const Interval(0.7, 1.0, curve: Curves.easeIn),
       ),
-    );
-    _rotation = Tween<double>(begin: 0.0, end: 360.0).animate(
-      CurvedAnimation(parent: _ringController, curve: Curves.linear),
     );
 
     _startAnim();
@@ -90,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     return Scaffold(
       body: Stack(
         children: [
-          // ধোঁয়ার ব্যাকগ্রাউন্ড - ডান দিক থেকে
+          // ধোঁয়ার ব্যাকগ্রাউন্ড - ডান দিক থেকে
           Positioned(
             right: -150,
             top: -100,
@@ -117,27 +113,24 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               builder: (context, child) {
                 return Transform.scale(
                   scale: _scale.value,
-                  child: Transform.rotate(
-                    angle: _rotation.value * 0.017453292519943295, // রেডিয়ানে রূপান্তর
-                    child: Container(
-                      width: 280,
-                      height: 280,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFFD700).withOpacity(0.5 * _glow.value),
-                            blurRadius: 80 * _glow.value,
-                            spreadRadius: 10 * _glow.value,
-                          ),
-                          BoxShadow(
-                            color: Colors.white.withOpacity(0.9 * _flash.value),
-                            blurRadius: 60 * _flash.value,
-                            spreadRadius: 30 * _flash.value,
-                          ),
-                        ],
-                      ),
-                      child: Image.asset('assets/logo.png'),
+                  child: Container(
+                    width: 280,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFD700).withOpacity(0.5 * _glow.value),
+                          blurRadius: 80 * _glow.value,
+                          spreadRadius: 10 * _glow.value,
+                        ),
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.9 * _flash.value),
+                          blurRadius: 60 * _flash.value,
+                          spreadRadius: 30 * _flash.value,
+                        ),
+                      ],
                     ),
+                    child: Image.asset('assets/logo.png'),
                   ),
                 );
               },
@@ -153,23 +146,11 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'ZAI Mail Home - Login UI',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // লগইন ফর্ম অথবা অন্যান্য উইজেট যোগ করুন
-              },
-              child: const Text('লগইন'),
-            ),
-          ],
+        child: Text(
+          'ZAI Mail Home - Login UI নেক্সট',
+          style: TextStyle(fontSize: 20, color: Colors.white),
         ),
       ),
     );

@@ -6,10 +6,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
-      body: SafeArea(
+      body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -23,15 +22,16 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 4,
+                  letterSpacing: 2,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Secure. Fast. Simple.',
+              const Text(
+                'Secure. Fast. Yours.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5)),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
               ),
               const SizedBox(height: 50),
 
@@ -44,7 +44,9 @@ class HomePage extends StatelessWidget {
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -58,7 +60,9 @@ class HomePage extends StatelessWidget {
                   backgroundColor: const Color(0xFF1877F2),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -70,24 +74,25 @@ class HomePage extends StatelessWidget {
                 label: const Text('Create ZAI MAIL Account'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF00FF88),
-                  side: const BorderSide(color: Color(0xFF00FF88), width: 2),
+                  side: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
+                children: const [
+                  Expanded(child: Divider(color: Colors.grey)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4))),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text('OR', style: TextStyle(color: Colors.grey)),
                   ),
-                  Expanded(child: Divider(color: Colors.white.withOpacity(0.2))),
+                  Expanded(child: Divider(color: Colors.grey)),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Login Button
               ElevatedButton(
@@ -95,20 +100,18 @@ class HomePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00FF88),
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: const Text(
-                  'LOG IN',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2),
+                  'Login',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 40),
-              Text(
-                'Powered by Meta',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3)),
               ),
             ],
           ),

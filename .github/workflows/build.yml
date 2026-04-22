@@ -18,7 +18,9 @@ jobs:
           
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.24.0' # Dart 3.5+ ফিক্স
+          channel: 'stable'
+          cache: true
           
       - name: Create main.dart - Ring Glow + Lightning
         run: |
@@ -114,6 +116,9 @@ jobs:
           
       - name: Fix pubspec.yaml
         run: |
+          # SDK ভার্সন ফিক্স
+          sed -i "s/sdk: '>=3.0.0 <4.0.0'/sdk: '>=3.5.0 <4.0.0'/" pubspec.yaml
+          # assets অ্যাড
           if ! grep -q "assets/logo.png" pubspec.yaml; then
             sed -i '/flutter:/a \  assets:\n    - assets/logo.png' pubspec.yaml
           fi

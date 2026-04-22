@@ -20,6 +20,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo_ring.png
-    - assets/logo_text.png
     - assets/logo.png

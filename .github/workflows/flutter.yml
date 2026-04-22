@@ -28,7 +28,7 @@ jobs:
           rm -f lib/ring_painter.dart lib/lightning_painter.dart
 
       - name: Rebuild Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail. --overwrite
+        run: flutter create --org com.zaimail --project-name zai_mail --overwrite .
 
       - name: Write main.dart
         run: |
@@ -51,7 +51,7 @@ jobs:
           }
           EOF
 
-      - name: Write splash_screen.dart - তোমার ছবির মতো
+      - name: Write splash_screen.dart
         run: |
           cat > lib/splash_screen.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -116,7 +116,7 @@ jobs:
           }
           EOF
 
-      - name: Write home_page.dart - 4টা বাটন সহ
+      - name: Write home_page.dart
         run: |
           cat > lib/home_page.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -138,4 +138,12 @@ jobs:
                         const SizedBox(height: 24),
                         const Text('ZAI MAIL', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
                         const SizedBox(height: 8),
-                        Text('Secure. Fast. Simple.', textAlign: TextAlign.center
+                        Text('Secure. Fast. Simple.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5))),
+                        const SizedBox(height: 50),
+                        ElevatedButton.icon(onPressed: () => _showSnack(context, 'Google Sign In'), icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28), label: const Text('Continue with Google'), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(onPressed: () => _showSnack(context, 'Facebook Sign In'), icon: const Icon(Icons.facebook, color: Colors.white), label: const Text('Continue with Facebook'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1877F2), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'), icon: const Icon(Icons.mail, color: Color(0xFF00FF88)), label: const Text('Create ZAI MAIL Account'), style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF00FF88), side: const BorderSide(color: Color(0xFF00FF88), width: 2), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+                        const SizedBox(height: 24),
+                        Row(children: [

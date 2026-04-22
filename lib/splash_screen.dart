@@ -85,34 +85,35 @@ class _SplashScreenState extends State<SplashScreen>
                   color: const Color(0xFFB4DCFF)
                   .withOpacity(0.18 * _flashController.value),
                 ),
-              
-              Center(
-                child: SizedBox(
-                  width: 320,
-                  height: 320,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ScaleTransition(
-                        scale: Tween(begin: 1.0, end: 1.15).animate(
-                          CurvedAnimation(
-                              parent: _haloController, curve: Curves.easeInOut),
-                        ),
-                        child: Container(
-                          width: 320,
-                          height: 320,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                const Color(0xFFD4AF37).withOpacity(0.08),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      RotationTransition(
+              // Center(...) এর পরে, Stack এর ভিতরে শেষে অ্যাড করো
+              Positioned(
+  bottom: 40,
+  left: 0,
+  right: 0,
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(
+        'Powered by ',
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.4),
+          fontSize: 12,
+          letterSpacing: 1.2,
+        ),
+      ),
+      Text(
+        'Meta',
+        style: TextStyle(
+          color: const Color(0xFF0081FB).withOpacity(0.6),
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
+        ),
+      ),
+    ],
+  ),
+),
+                    RotationTransition(
                         turns: _ringController,
                         child: CustomPaint(
                           size: const Size(280, 280),

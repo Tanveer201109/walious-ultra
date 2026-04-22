@@ -19,6 +19,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # লোগো ইমেজ লাগলে এখানে assets অ্যাড করবো
-  # assets:
-  #   - assets/logo.png
+  assets:
+    - assets/logo.png

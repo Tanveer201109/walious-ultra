@@ -86,7 +86,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     return Scaffold(
       body: Stack(
         children: [
-          // ধোঁয়ার ব্যাকগ্রাউন্ড - ডান দিক থেকে
           Positioned(
             right: -150,
             top: -100,
@@ -106,7 +105,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               ),
             ),
           ),
-          // লোগো + বিদ্যুৎ ইফেক্ট
           Center(
             child: AnimatedBuilder(
               animation: Listenable.merge([_ringController, _flashController]),

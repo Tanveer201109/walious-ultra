@@ -6,12 +6,12 @@ import 'home_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
   late AnimationController _ringController;
   late AnimationController _haloController;
   late AnimationController _flashController;
@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _ringController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _startLightningLoop();
-    
+
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -83,142 +83,137 @@ class _SplashScreenState extends State<SplashScreen>
               if (_flashController.value > 0)
                 Container(
                   color: const Color(0xFFB4DCFF)
-                  .withOpacity(0.18 * _flashController.value),
+                      .withOpacity(0.18 * _flashController.value),
                 ),
-              // Center(...) এর পরে, Stack এর ভিতরে শেষে অ্যাড করো
               Positioned(
-  bottom: 40,
-  left: 0,
-  right: 0,
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Text(
-        'Powered by ',
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.4),
-          fontSize: 12,
-          letterSpacing: 1.2,
-        ),
-      ),
-      Text(
-        'Meta',
-        style: TextStyle(
-          color: const Color(0xFF0081FB).withOpacity(0.6),
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1.2,
-        ),
-      ),
-    ],
-  ),
-),
-                    RotationTransition(
-                        turns: _ringController,
-                        child: CustomPaint(
-                          size: const Size(280, 280),
-                          painter: RingPainter(),
-                        ),
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'সম্পন্ন করা হয়েছে দ্বারা ',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 12,
+                        letterSpacing: 1.2,
                       ),
-                      ClipOval(
-                        child: SizedBox(
-                          width: 274,
-                          height: 274,
-                          child: CustomPaint(
-                            painter: LightningPainter(
-                                _flashController.value, _random),
-                          ),
-                        ),
+                    ),
+                    Text(
+                      'আল্লাহ',
+                      style: TextStyle(
+                        color: const Color(0xFF0081FB).withOpacity(0.6),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                  fontFamily: 'Georgia', fontSize: 52),
-                              children: [
-                                TextSpan(
-                                    text: '[',
-                                    style: TextStyle(
-                                        color: const Color(0xFFC8C8C8),
-                                        fontWeight: FontWeight.w300,
-                                        letterSpacing: -2,
-                                        shadows: [
-                                          Shadow(
-                                              color: Colors.grey
-                                              .withOpacity(0.6),
-                                              blurRadius: 20)
-                                        ])),
-                                const TextSpan(
-                                    text: 'z',
-                                    style: TextStyle(
-                                        fontSize: 44,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        shadows: [
-                                          Shadow(
-                                              color: Colors.white,
-                                              blurRadius: 8)
-                                        ])),
-                                const TextSpan(
-                                    text: 'A',
-                                    style: TextStyle(
-                                        fontSize: 56,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        shadows: [
-                                          Shadow(
-                                              color: Colors.white,
-                                              blurRadius: 8)
-                                        ])),
-                                const TextSpan(
-                                    text: 'i',
-                                    style: TextStyle(
-                                        fontSize: 48,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        shadows: [
-                                          Shadow(
-                                              color: Colors.white,
-                                              blurRadius: 8)
-                                        ])),
-                                TextSpan(
-                                    text: ']',
-                                    style: TextStyle(
-                                        color: const Color(0xFFC8C8C8),
-                                        fontWeight: FontWeight.w300,
-                                        letterSpacing: -2,
-                                        shadows: [
-                                          Shadow(
-                                              color: Colors.grey
-                                              .withOpacity(0.6),
-                                              blurRadius: 20)
-                                        ])),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'THE FAITH STANDARD',
-                            style: TextStyle(
-                              fontSize: 11,
-                              letterSpacing: 4,
-                              color:
-                                  const Color(0xFFD4AF37).withOpacity(0.8),
-                              shadows: [
-                                Shadow(
-                                    color: const Color(0xFFD4AF37)
-                                    .withOpacity(0.5),
-                                    blurRadius: 10)
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              RotationTransition(
+                turns: _ringController,
+                child: CustomPaint(
+                  size: const Size(280, 280),
+                  painter: RingPainter(),
+                ),
+              ),
+              ClipOval(
+                child: SizedBox(
+                  width: 274,
+                  height: 274,
+                  child: CustomPaint(
+                    painter: LightningPainter(
+                        _flashController.value, _random),
                   ),
                 ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                          fontFamily: 'Georgia', fontSize: 52),
+                      children: [
+                        TextSpan(
+                            text: '[',
+                            style: TextStyle(
+                                color: const Color(0xFFC8C8C8),
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: -2,
+                                shadows: [
+                                  Shadow(
+                                      color: Colors.grey
+                                          .withOpacity(0.6),
+                                      blurRadius: 20)
+                                ])),
+                        const TextSpan(
+                            text: 'z',
+                            style: TextStyle(
+                                fontSize: 44,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                      color: Colors.white,
+                                      blurRadius: 8)
+                                ])),
+                        const TextSpan(
+                            text: 'A',
+                            style: TextStyle(
+                                fontSize: 56,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                      color: Colors.white,
+                                      blurRadius: 8)
+                                ])),
+                        const TextSpan(
+                            text: 'i',
+                            style: TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                      color: Colors.white,
+                                      blurRadius: 8)
+                                ])),
+                        TextSpan(
+                            text: ']',
+                            style: TextStyle(
+                                color: const Color(0xFFC8C8C8),
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: -2,
+                                shadows: [
+                                  Shadow(
+                                      color: Colors.grey
+                                          .withOpacity(0.6),
+                                      blurRadius: 20)
+                                ])),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'সম্পন্ন করা হয়েছে',
+                    style: TextStyle(
+                      fontSize: 11,
+                      letterSpacing: 4,
+                      color:
+                          const Color(0xFFD4AF37).withOpacity(0.8),
+                      shadows: [
+                        Shadow(
+                            color: const Color(0xFFD4AF37)
+                                .withOpacity(0.5),
+                            blurRadius: 10)
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           );

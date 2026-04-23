@@ -21,7 +21,7 @@ jobs:
           channel: 'stable'
 
       - name: 1. Create fresh Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail --platforms android.
+        run: flutter create --org com.zaimail --project-name zai_mail --platforms android. 
 
       # FIX: Gradle SDK ভার্সন বাড়াও
       - name: 1.1 Fix Gradle SDK versions

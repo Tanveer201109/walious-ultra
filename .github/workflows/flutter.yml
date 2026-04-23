@@ -20,6 +20,7 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
+      # FIX: android আর. আলাদা আর্গুমেন্ট হিসেবে দিলাম
       - name: 1. Create fresh Flutter project
         run: flutter create --org com.zaimail --project-name zai_mail --platforms android.
 

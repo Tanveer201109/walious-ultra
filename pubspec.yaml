@@ -1,5 +1,5 @@
-name: zai_mail
-description: 18 ULTRA AI
+name: xAi
+description: X CHAIN WALLET
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  http: ^1.2.2
+  geolocator: ^13.0.1
 
 dev_dependencies:
   flutter_test:

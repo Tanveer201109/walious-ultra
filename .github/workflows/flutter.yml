@@ -20,10 +20,9 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      # FIX: android এর পরে স্পেস, তারপর ডট
+      # FIX: android আর ডট এর মাঝে স্পেস দিছি
       - name: 1. Create fresh Flutter project
-        run: |
-          flutter create --org com.zaimail --project-name zai_mail --platforms android.
+        run: flutter create --org com.zaimail --project-name zai_mail --platforms android.
 
       - name: 2. Write lib/main.dart
         run: |

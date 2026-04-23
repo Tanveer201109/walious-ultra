@@ -21,7 +21,7 @@ jobs:
           channel: 'stable'
 
       # FIX: android আর. আলাদা আর্গুমেন্ট হিসেবে দিলাম
-      - name: 1. Create fresh Flutter project
+      - name: Create fresh Flutter project
         run: flutter create --org com.zaimail --project-name zai_mail --platforms android.
 
       - name: 2. Write lib/main.dart

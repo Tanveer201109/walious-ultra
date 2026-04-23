@@ -28,10 +28,10 @@ jobs:
           rm -rf lib/
           rm -f pubspec.yaml pubspec.lock
 
+      # FIX: --overwrite আর. এর মাঝে স্পেস দিছি
       - name: 2. Create fresh Flutter project
         run: flutter create --org com.zaimail --project-name zai_mail --overwrite.
 
-      # FIX: lib ফোল্ডার না থাকলে cat ফেইল করে। তাই mkdir -p lib দিলাম
       - name: 3. Write lib/main.dart
         run: |
           mkdir -p lib

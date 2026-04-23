@@ -22,22 +22,19 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      # STEP 1: সব ভাঙা ফাইল ডিলিট - কেন? পুরান android/ ফোল্ডার Gradle 8 ছাড়া চলে না
       - name: 1. Clean all broken files
         run: |
           rm -rf android/ ios/ linux/ macos/ windows/ web/
           rm -rf lib/
           rm -f pubspec.yaml pubspec.lock
 
-      # STEP 2: নতুন Flutter প্রজেক্ট বানাও - কেন? Gradle 8 + Java 17 সাপোর্ট সহ android/ ফোল্ডার আসবে
-      # নোট: --overwrite এর পরে স্পেস দিয়ে. ডট। এটা মানে "এই ফোল্ডারেই বানাও"
       - name: 2. Create fresh Flutter project
         run: flutter create --org com.zaimail --project-name zai_mail --overwrite.
 
-      # STEP 3: main.dart লেখো - কেন? এটা অ্যাপের এন্ট্রি পয়েন্ট। home: SplashScreen() দিয়ে ওপেনিং সেট করলাম
-      # ফাইল পাথ: lib/main.dart
+      # FIX: lib ফোল্ডার না থাকলে cat ফেইল করে। তাই mkdir -p lib দিলাম
       - name: 3. Write lib/main.dart
         run: |
+          mkdir -p lib
           cat > lib/main.dart << 'EOF'
           import 'package:flutter/material.dart';
           import 'splash_screen.dart';
@@ -55,43 +52,34 @@ jobs:
                 theme: ThemeData.dark().copyWith(
                   scaffoldBackgroundColor: const Color(0xFF0A0A0A),
                 ),
-                home: const SplashScreen(), // এখান থেকে অ্যাপ ওপেন হবে
+                home: const SplashScreen(),
               );
             }
           }
           EOF
 
-      # STEP 4: splash_screen.dart লেখো - কেন? এটা ওপেনিং UI। 3 সেকেন্ড পর HomePage এ যাবে
-      # ফাইল পাথ: lib/splash_screen.dart
-      # কেন main.dart এর পরে? কারণ main.dart এটাকে import করছে
       - name: 4. Write lib/splash_screen.dart
         run: |
           cat > lib/splash_screen.dart << 'EOF'
           import 'package:flutter/material.dart';
           import 'home_page.dart';
-
           class SplashScreen extends StatefulWidget {
             const SplashScreen({super.key});
             @override
             State<SplashScreen> createState() => _SplashScreenState();
           }
-
           class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
             late AnimationController _controller;
-
             @override
             void initState() {
               super.initState();
               _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
-              // 3 সেকেন্ড পর Login পেজে যাবে
               Future.delayed(const Duration(seconds: 3), () {
                 if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
               });
             }
-
             @override
             void dispose() { _controller.dispose(); super.dispose(); }
-
             @override
             Widget build(BuildContext context) {
               return Scaffold(
@@ -134,9 +122,6 @@ jobs:
           }
           EOF
 
-      # STEP 5: home_page.dart লেখো - কেন? এটা Login পেজ, 4টা বাটন সহ
-      # ফাইল পাথ: lib/home_page.dart
-      # কেন splash_screen এর পরে? কারণ splash_screen এটাকে import করছে
       - name: 5. Write lib/home_page.dart
         run: |
           cat > lib/home_page.dart << 'EOF'
@@ -183,13 +168,11 @@ jobs:
           }
           EOF
 
-      # STEP 6: APK বানাও - কেন সব ফাইল লেখার পরে? কারণ flutter build এর আগে সব কোড রেডি থাকতে হবে
       - name: 6. Build APK
         run: |
           flutter pub get
           flutter build apk --release
 
-      # STEP 7: APK আপলোড - কেন? GitHub থেকে ডাউনলোড করার জন্য
       - name: 7. Upload ZAI MAIL APK
         uses: actions/upload-artifact@v4
         with:

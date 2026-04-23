@@ -22,20 +22,30 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Clean project
+      # STEP 1: সব ভাঙা ফাইল ডিলিট - কেন? পুরান android/ ফোল্ডার Gradle 8 ছাড়া চলে না
+      - name: 1. Clean all broken files
         run: |
           rm -rf android/ ios/ linux/ macos/ windows/ web/
-          rm -f lib/ring_painter.dart lib/lightning_painter.dart
+          rm -rf lib/
+          rm -f pubspec.yaml pubspec.lock
 
-      - name: Rebuild Flutter project
+      # STEP 2: নতুন Flutter প্রজেক্ট বানাও - কেন? Gradle 8 + Java 17 সাপোর্ট সহ android/ ফোল্ডার আসবে
+      # নোট: --overwrite এর পরে স্পেস দিয়ে. ডট। এটা মানে "এই ফোল্ডারেই বানাও"
+      - name: 2. Create fresh Flutter project
         run: flutter create --org com.zaimail --project-name zai_mail --overwrite.
 
-      - name: Write main.dart
+      # STEP 3: main.dart লেখো - কেন? এটা অ্যাপের এন্ট্রি পয়েন্ট। home: SplashScreen() দিয়ে ওপেনিং সেট করলাম
+      # ফাইল পাথ: lib/main.dart
+      - name: 3. Write lib/main.dart
         run: |
           cat > lib/main.dart << 'EOF'
           import 'package:flutter/material.dart';
           import 'splash_screen.dart';
-          void main() { runApp(const ZaiMailApp()); }
+
+          void main() {
+            runApp(const ZaiMailApp());
+          }
+
           class ZaiMailApp extends StatelessWidget {
             const ZaiMailApp({super.key});
             @override
@@ -45,34 +55,43 @@ jobs:
                 theme: ThemeData.dark().copyWith(
                   scaffoldBackgroundColor: const Color(0xFF0A0A0A),
                 ),
-                home: const SplashScreen(),
+                home: const SplashScreen(), // এখান থেকে অ্যাপ ওপেন হবে
               );
             }
           }
           EOF
 
-      - name: Write splash_screen.dart
+      # STEP 4: splash_screen.dart লেখো - কেন? এটা ওপেনিং UI। 3 সেকেন্ড পর HomePage এ যাবে
+      # ফাইল পাথ: lib/splash_screen.dart
+      # কেন main.dart এর পরে? কারণ main.dart এটাকে import করছে
+      - name: 4. Write lib/splash_screen.dart
         run: |
           cat > lib/splash_screen.dart << 'EOF'
           import 'package:flutter/material.dart';
           import 'home_page.dart';
+
           class SplashScreen extends StatefulWidget {
             const SplashScreen({super.key});
             @override
             State<SplashScreen> createState() => _SplashScreenState();
           }
+
           class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
             late AnimationController _controller;
+
             @override
             void initState() {
               super.initState();
               _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
+              // 3 সেকেন্ড পর Login পেজে যাবে
               Future.delayed(const Duration(seconds: 3), () {
                 if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
               });
             }
+
             @override
             void dispose() { _controller.dispose(); super.dispose(); }
+
             @override
             Widget build(BuildContext context) {
               return Scaffold(
@@ -86,7 +105,6 @@ jobs:
                           center: Alignment.center,
                           radius: 0.6 + _controller.value * 0.1,
                           colors: [const Color(0xFF00FF88).withOpacity(0.15 + _controller.value * 0.1), const Color(0xFF0A0A0A)],
-                          stops: const [0.0, 1.0],
                         ),
                       ),
                       child: Center(
@@ -116,7 +134,10 @@ jobs:
           }
           EOF
 
-      - name: Write home_page.dart
+      # STEP 5: home_page.dart লেখো - কেন? এটা Login পেজ, 4টা বাটন সহ
+      # ফাইল পাথ: lib/home_page.dart
+      # কেন splash_screen এর পরে? কারণ splash_screen এটাকে import করছে
+      - name: 5. Write lib/home_page.dart
         run: |
           cat > lib/home_page.dart << 'EOF'
           import 'package:flutter/material.dart';
@@ -162,12 +183,14 @@ jobs:
           }
           EOF
 
-      - name: Build APK
+      # STEP 6: APK বানাও - কেন সব ফাইল লেখার পরে? কারণ flutter build এর আগে সব কোড রেডি থাকতে হবে
+      - name: 6. Build APK
         run: |
           flutter pub get
           flutter build apk --release
 
-      - name: Upload ZAI MAIL APK
+      # STEP 7: APK আপলোড - কেন? GitHub থেকে ডাউনলোড করার জন্য
+      - name: 7. Upload ZAI MAIL APK
         uses: actions/upload-artifact@v4
         with:
           name: ZAI-MAIL-GREEN-APK

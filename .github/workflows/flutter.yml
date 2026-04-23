@@ -1,172 +1,161 @@
-name: ZAI MAIL Green Build
+name: Flutter ZAI MAIL Build
+
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Setup Java 17
+      - name: 1. Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Flutter 3.24
+      - name: 3. Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      # FIX: android আর. আলাদা আর্গুমেন্ট হিসেবে দিলাম
-      - name: Create fresh Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail --platforms android.
+      - name: 4. Create fresh Flutter project
+        run: flutter create --org com.zaimail --project-name zai_mail --platforms android .
 
-      - name: 2. Write lib/main.dart
+      - name: 5. Get dependencies
+        run: flutter pub get
+
+      - name: 6. Add auth packages
         run: |
-          cat > lib/main.dart << 'EOF'
-          import 'package:flutter/material.dart';
-          import 'splash_screen.dart';
+          flutter pub add firebase_core
+          flutter pub add firebase_auth
+          flutter pub add google_sign_in
+          flutter pub add flutter_facebook_auth
 
-          void main() {
-            runApp(const ZaiMailApp());
-          }
-
-          class ZaiMailApp extends StatelessWidget {
-            const ZaiMailApp({super.key});
-            @override
-            Widget build(BuildContext context) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData.dark().copyWith(
-                  scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-                ),
-                home: const SplashScreen(),
-              );
-            }
-          }
-          EOF
-
-      - name: 3. Write lib/splash_screen.dart
-        run: |
-          cat > lib/splash_screen.dart << 'EOF'
-          import 'package:flutter/material.dart';
-          import 'home_page.dart';
-          class SplashScreen extends StatefulWidget {
-            const SplashScreen({super.key});
-            @override
-            State<SplashScreen> createState() => _SplashScreenState();
-          }
-          class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-            late AnimationController _controller;
-            @override
-            void initState() {
-              super.initState();
-              _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
-              Future.delayed(const Duration(seconds: 3), () {
-                if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-              });
-            }
-            @override
-            void dispose() { _controller.dispose(); super.dispose(); }
-            @override
-            Widget build(BuildContext context) {
-              return Scaffold(
-                backgroundColor: const Color(0xFF0A0A0A),
-                body: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.6 + _controller.value * 0.1,
-                          colors: [const Color(0xFF00FF88).withOpacity(0.15 + _controller.value * 0.1), const Color(0xFF0A0A0A)],
-                        ),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.flash_on, size: 60, color: const Color(0xFF00FF88), shadows: [Shadow(color: const Color(0xFF00FF88).withOpacity(0.8), blurRadius: 20 + _controller.value * 10)]),
-                            const SizedBox(height: 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Z', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: 20)),
-                                Text('A', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: 20)),
-                                Text('I', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white)),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text('M A I L', style: TextStyle(fontSize: 16, letterSpacing: 12, color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w300)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
-          }
-          EOF
-
-      - name: 4. Write lib/home_page.dart
+      - name: 7. Replace home_page.dart
         run: |
           cat > lib/home_page.dart << 'EOF'
           import 'package:flutter/material.dart';
+          import 'package:firebase_auth/firebase_auth.dart';
+          import 'package:google_sign_in/google_sign_in.dart';
+          import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+
           class HomePage extends StatelessWidget {
             const HomePage({super.key});
+
             @override
             Widget build(BuildContext context) {
               return Scaffold(
-                backgroundColor: const Color(0xFF0A0A0A),
-                body: SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                body: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const SizedBox(height: 60),
                         Icon(Icons.flash_on, size: 80, color: const Color(0xFF00FF88)),
                         const SizedBox(height: 24),
-                        const Text('ZAI MAIL', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
-                        const SizedBox(height: 8),
-                        Text('Secure. Fast. Simple.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5))),
+                        const Text('ZAI MAIL', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                        const Text('Secure. Fast. Yours.', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Colors.grey)),
                         const SizedBox(height: 50),
-                        ElevatedButton.icon(onPressed: () => _showSnack(context, 'Google Sign In'), icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28), label: const Text('Continue with Google'), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+                        ElevatedButton.icon(
+                          onPressed: () => _handleGoogleSignIn(context),
+                          icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
+                          label: const Text('Continue with Google'),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                        ),
                         const SizedBox(height: 12),
-                        ElevatedButton.icon(onPressed: () => _showSnack(context, 'Facebook Sign In'), icon: const Icon(Icons.facebook, color: Colors.white), label: const Text('Continue with Facebook'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1877F2), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+                        ElevatedButton.icon(
+                          onPressed: () => _handleFacebookSignIn(context),
+                          icon: const Icon(Icons.facebook, color: Colors.white),
+                          label: const Text('Continue with Facebook'),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1877F2), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                        ),
                         const SizedBox(height: 12),
-                        OutlinedButton.icon(onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'), icon: const Icon(Icons.mail, color: Color(0xFF00FF88)), label: const Text('Create ZAI MAIL Account'), style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF00FF88), side: const BorderSide(color: Color(0xFF00FF88), width: 2), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
-                        const SizedBox(height: 24),
-                        Row(children: [Expanded(child: Divider(color: Colors.white.withOpacity(0.2))), Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4)))), Expanded(child: Divider(color: Colors.white.withOpacity(0.2)))]),
-                        const SizedBox(height: 24),
-                        ElevatedButton(onPressed: () => _showSnack(context, 'LOG IN'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FF88), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('LOG IN', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2))),
-                        const SizedBox(height: 40),
-                        Text('Powered by Meta', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3))),
-                        const SizedBox(height: 40),
+                        OutlinedButton.icon(
+                          onPressed: () => _handleZaiMailCreate(context),
+                          icon: const Icon(Icons.mail, color: Color(0xFF00FF88)),
+                          label: const Text('Create ZAI MAIL Account'),
+                          style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF00FF88), side: const BorderSide(color: Color(0xFF00FF88), width: 1.5), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(children: const [Expanded(child: Divider(color: Colors.grey)), Padding(padding: EdgeInsets.symmetric(horizontal: 8.0), child: Text('OR', style: TextStyle(color: Colors.grey))), Expanded(child: Divider(color: Colors.grey))]),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () => _handleLogin(context),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FF88), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                          child: const Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
                       ],
                     ),
                   ),
                 ),
               );
             }
-            void _showSnack(BuildContext context, String msg) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg))); }
+
+            Future<void> _handleGoogleSignIn(BuildContext context) async {
+              try {
+                _showSnack(context, 'Signing in with Google...');
+                final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+                if (googleUser == null) return;
+                final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+                final credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+                await FirebaseAuth.instance.signInWithCredential(credential);
+                _showSnack(context, 'Google Sign In Success');
+              } catch (e) {
+                _showSnack(context, 'Google Sign In Failed: $e');
+              }
+            }
+
+            Future<void> _handleFacebookSignIn(BuildContext context) async {
+              try {
+                _showSnack(context, 'Signing in with Facebook...');
+                final LoginResult result = await FacebookAuth.instance.login();
+                if (result.status == LoginStatus.success) {
+                  final AccessToken accessToken = result.accessToken!;
+                  final OAuthCredential credential = FacebookAuthProvider.credential(accessToken.tokenString);
+                  await FirebaseAuth.instance.signInWithCredential(credential);
+                  _showSnack(context, 'Facebook Sign In Success');
+                } else {
+                  _showSnack(context, 'Facebook Sign In Cancelled');
+                }
+              } catch (e) {
+                _showSnack(context, 'Facebook Sign In Failed: $e');
+              }
+            }
+
+            void _handleZaiMailCreate(BuildContext context) {
+              _showSnack(context, 'Opening Register Page...');
+            }
+
+            void _handleLogin(BuildContext context) {
+              _showSnack(context, 'Opening Login Page...');
+            }
+
+            void _showSnack(BuildContext context, String msg) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))));
+            }
           }
           EOF
 
-      - name: 5. Build APK
+      - name: 8. Update main.dart to use HomePage
         run: |
-          flutter pub get
-          flutter build apk --release
+          sed -i 's/home: const MyHomePage.*/home: const HomePage(),/' lib/main.dart
+          sed -i '1i import '\''package:zai_mail/home_page.dart'\'';' lib/main.dart
 
-      - name: 6. Upload ZAI MAIL APK
+      - name: 9. Build APK
+        run: flutter build apk --release
+
+      - name: 10. Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ZAI-MAIL-GREEN-APK
+          name: zai-mail-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error

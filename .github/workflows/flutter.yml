@@ -1,186 +1,108 @@
-name: ZAI MAIL Green Build
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+- name: 1. Create fresh Flutter project in root
+  run: flutter create --org com.zaimail --project-name zai_mail --platforms android .
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+- name: 1.1 Fix Gradle SDK versions
+  run: |
+    sed -i 's/flutter.minSdkVersion=.*/flutter.minSdkVersion=23/' android/local.properties
+    sed -i 's/flutter.compileSdkVersion=.*/flutter.compileSdkVersion=34/' android/local.properties
+    sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle
+    sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle
 
-      - name: Setup Flutter 3.24
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+- name: 2. Write lib/main.dart
+  run: |
+    cat > lib/main.dart << 'EOF'
+    import 'package:flutter/material.dart';
 
-      - name: 1. Create fresh Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail --platforms android .
+    void main() {
+      runApp(MyApp());
+    }
 
-      - name: 1.1 Fix Gradle SDK versions
-        working-directory: ./zai_mail
-        run: |
-          # Flutter 3.24+ এ local.properties ইউজ করা সেফ
-          sed -i 's/flutter.minSdkVersion=.*/flutter.minSdkVersion=23/' android/local.properties
-          sed -i 's/flutter.compileSdkVersion=.*/flutter.compileSdkVersion=34/' android/local.properties
-          
-          # backup হিসেবে build.gradle ও চেঞ্জ করে রাখলাম
-          sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/' android/app/build.gradle
-          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle
+    class MyApp extends StatelessWidget {
+      @override
+      Widget build(BuildContext context) {
+        return MaterialApp(
+          title: 'xAi Wallet',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: SplashScreen(),
+        );
+      }
+    }
+    EOF
 
-      - name: 2. Write lib/main.dart
-        working-directory: ./zai_mail
-        run: |
-          cat > lib/main.dart << 'EOF'
-          import 'package:flutter/material.dart';
-          import 'splash_screen.dart';
+- name: 3. Write lib/splash_screen.dart
+  run: |
+    cat > lib/splash_screen.dart << 'EOF'
+    import 'package:flutter/material.dart';
 
-          void main() {
-            runApp(const ZaiMailApp());
-          }
+    class SplashScreen extends StatefulWidget {
+      @override
+      _SplashScreenState createState() => _SplashScreenState();
+    }
 
-          class ZaiMailApp extends StatelessWidget {
-            const ZaiMailApp({super.key});
-            @override
-            Widget build(BuildContext context) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData.dark().copyWith(
-                  scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-                ),
-                home: const SplashScreen(),
-              );
-            }
-          }
-          EOF
+    class _SplashScreenState extends State<SplashScreen> {
+      @override
+      void initState() {
+        super.initState();
+        Future.delayed(Duration(seconds: 3), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        });
+      }
 
-      - name: 3. Write lib/splash_screen.dart
-        working-directory: ./zai_mail
-        run: |
-          cat > lib/splash_screen.dart << 'EOF'
-          import 'package:flutter/material.dart';
-          import 'home_page.dart';
-          class SplashScreen extends StatefulWidget {
-            const SplashScreen({super.key});
-            @override
-            State<SplashScreen> createState() => _SplashScreenState();
-          }
-          class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-            late AnimationController _controller;
-            @override
-            void initState() {
-              super.initState();
-              _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
-              Future.delayed(const Duration(seconds: 3), () {
-                if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-              });
-            }
-            @override
-            void dispose() { _controller.dispose(); super.dispose(); }
-            @override
-            Widget build(BuildContext context) {
-              return Scaffold(
-                backgroundColor: const Color(0xFF0A0A0A),
-                body: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.6 + _controller.value * 0.1,
-                          colors: [const Color(0xFF00FF88).withOpacity(0.15 + _controller.value * 0.1), const Color(0xFF0A0A0A)],
-                        ),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.flash_on, size: 60, color: const Color(0xFF00FF88), shadows: [Shadow(color: const Color(0xFF00FF88).withOpacity(0.8), blurRadius: 20 + _controller.value * 10)]),
-                            const SizedBox(height: 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Z', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: 20)),
-                                Text('A', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: 20)),
-                                Text('I', style: TextStyle(fontSize: 52, fontWeight: FontWeight.w300, color: Colors.white)),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text('M A I L', style: TextStyle(fontSize: 16, letterSpacing: 12, color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w300)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
-          }
-          EOF
+      @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+          body: Center(
+            child: Text('xAi Wallet'),
+          ),
+        );
+      }
+    }
+    EOF
 
-      - name: 4. Write lib/home_page.dart
-        working-directory: ./zai_mail
-        run: |
-          cat > lib/home_page.dart << 'EOF'
-          import 'package:flutter/material.dart';
-          class HomePage extends StatelessWidget {
-            const HomePage({super.key});
-            @override
-            Widget build(BuildContext context) {
-              return Scaffold(
-                backgroundColor: const Color(0xFF0A0A0A),
-                body: SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 60),
-                        Icon(Icons.flash_on, size: 80, color: const Color(0xFF00FF88)),
-                        const SizedBox(height: 24),
-                        const Text('ZAI MAIL', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
-                        const SizedBox(height: 8),
-                        Text('Secure. Fast. Simple.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.5))),
-                        const SizedBox(height: 50),
-                        ElevatedButton.icon(onPressed: () => _showSnack(context, 'Google Sign In'), icon: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28), label: const Text('Continue with Google'), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
-                        const SizedBox(height: 12),
-                        ElevatedButton.icon(onPressed: () => _showSnack(context, 'Facebook Sign In'), icon: const Icon(Icons.facebook, color: Colors.white), label: const Text('Continue with Facebook'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1877F2), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
-                        const SizedBox(height: 12),
-                        OutlinedButton.icon(onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'), icon: const Icon(Icons.mail, color: Color(0xFF00FF88)), label: const Text('Create ZAI MAIL Account'), style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF00FF88), side: const BorderSide(color: Color(0xFF00FF88), width: 2), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
-                        const SizedBox(height: 24),
-                        Row(children: [Expanded(child: Divider(color: Colors.white.withOpacity(0.2))), Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4)))), Expanded(child: Divider(color: Colors.white.withOpacity(0.2)))]),
-                        const SizedBox(height: 24),
-                        ElevatedButton(onPressed: () => _showSnack(context, 'LOG IN'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FF88), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('LOG IN', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2))),
-                        const SizedBox(height: 40),
-                        Text('Powered by Meta', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3))),
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-            void _showSnack(BuildContext context, String msg) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg))); }
-          }
-          EOF
+- name: 4. Write lib/home_page.dart
+  run: |
+    cat > lib/home_page.dart << 'EOF'
+    import 'package:flutter/material.dart';
 
-      - name: 5. Build APK
-        working-directory: ./zai_mail
-        run: |
-          flutter pub get
-          flutter build apk --release
+    class HomePage extends StatefulWidget {
+      @override
+      _HomePageState createState() => _HomePageState();
+    }
 
-      - name: 6. Upload ZAI MAIL APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ZAI-MAIL-GREEN-APK
-          path: zai_mail/build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
+    class _HomePageState extends State<HomePage> {
+      @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('xAi Wallet'),
+                SizedBox(height: 20),
+                Image.asset('assets/ring.png', width: 100, height: 100),
+                SizedBox(height: 20),
+                Text('Ring Color: Redium Smoke'),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+    EOF
+
+- name: 5. Build APK
+  run: |
+    flutter pub get
+    flutter build apk --release
+
+- name: 6. Upload ZAI MAIL APK
+  uses: actions/upload-artifact@v4
+  with:
+    name: ZAI-MAIL-GREEN-APK
+    path: build/app/outputs/flutter-apk/app-release.apk
+    if-no-files-found: error

@@ -28,7 +28,7 @@ jobs:
           rm -f lib/ring_painter.dart lib/lightning_painter.dart
 
       - name: Rebuild Flutter project
-        run: flutter create --org com.zaimail --project-name zai_mail --overwrite .
+        run: flutter create --org com.zaimail --project-name zai_mail --overwrite.
 
       - name: Write main.dart
         run: |
@@ -146,4 +146,30 @@ jobs:
                         const SizedBox(height: 12),
                         OutlinedButton.icon(onPressed: () => _showSnack(context, 'Create ZAI MAIL Account'), icon: const Icon(Icons.mail, color: Color(0xFF00FF88)), label: const Text('Create ZAI MAIL Account'), style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF00FF88), side: const BorderSide(color: Color(0xFF00FF88), width: 2), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
                         const SizedBox(height: 24),
-                        Row(children: [
+                        Row(children: [Expanded(child: Divider(color: Colors.white.withOpacity(0.2))), Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.4)))), Expanded(child: Divider(color: Colors.white.withOpacity(0.2)))]),
+                        const SizedBox(height: 24),
+                        ElevatedButton(onPressed: () => _showSnack(context, 'LOG IN'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FF88), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('LOG IN', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 2))),
+                        const SizedBox(height: 40),
+                        Text('Powered by Meta', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.3))),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+            void _showSnack(BuildContext context, String msg) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg))); }
+          }
+          EOF
+
+      - name: Build APK
+        run: |
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload ZAI MAIL APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZAI-MAIL-GREEN-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error

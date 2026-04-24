@@ -1,0 +1,7 @@
+- name: Check if file exists
+  run: |
+    if [ -f "requirements.txt" ]; then
+      echo "File found"
+    else
+      echo "No file, skipping"
+    fi

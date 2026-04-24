@@ -1,4 +1,4 @@
-name: xAI Wallet KYC Ultra
+name: xAI Wallet Simple Build
 
 on:
   push:
@@ -29,27 +29,18 @@ jobs:
 
       - name: 1.1. Set App Name & Package
         run: |
-          # App এর নাম চেঞ্জ - ফোনে "xAI Wallet KYC Ultra" দেখাবে
-          sed -i 's/android:label="xai_wallet"/android:label="xAI Wallet KYC Ultra"/g' android/app/src/main/AndroidManifest.xml
-          
-          # Package name চেঞ্জ com.migoxai.xai_wallet
+          sed -i 's/android:label="xai_wallet"/android:label="xAI Wallet"/g' android/app/src/main/AndroidManifest.xml
           sed -i 's/com.migoxai.xai_wallet/com.migoxai.wallet/g' android/app/build.gradle
           sed -i 's/com.migoxai.xai_wallet/com.migoxai.wallet/g' android/app/src/main/AndroidManifest.xml
-          
-          # Kotlin folder fix
           mkdir -p android/app/src/main/kotlin/com/migoxai/wallet
           mv android/app/src/main/kotlin/com/migoxai/xai_wallet/MainActivity.kt android/app/src/main/kotlin/com/migoxai/wallet/ 2>/dev/null || true
           rm -rf android/app/src/main/kotlin/com/migoxai/xai_wallet
 
-      - name: 2. Add Camera Permissions
-        run: |
-          sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.CAMERA"\/>\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"\/>' android/app/src/main/AndroidManifest.xml
-
-      - name: 3. Update pubspec.yaml
+      - name: 2. Update pubspec.yaml
         run: |
           cat > pubspec.yaml << 'EOF'
           name: xai_wallet
-          description: X CHAIN WALLET with Real Face KYC Ultra
+          description: xAI Wallet - Simple Crypto Wallet
           publish_to: 'none'
           version: 1.0.0+1
 
@@ -60,9 +51,6 @@ jobs:
             flutter:
               sdk: flutter
             cupertino_icons: ^1.0.8
-            camera: ^0.10.5
-            image_picker: ^1.1.2
-            permission_handler: ^11.3.1
             shared_preferences: ^2.2.3
             uuid: ^4.4.0
 
@@ -75,15 +63,18 @@ jobs:
             uses-material-design: true
           EOF
 
-      - name: 4. Get dependencies
+      - name: 3. Get dependencies
         run: flutter pub get
 
-      - name: 5. Write all Dart files
+      - name: 4. Write Simple Wallet UI
         run: |
           cat > lib/main.dart << 'EOF'
           import 'package:flutter/material.dart';
-          import 'splash_screen.dart';
+          import 'package:uuid/uuid.dart';
+          import 'package:shared_preferences/shared_preferences.dart';
+
           void main() { runApp(const XaiWalletApp()); }
+
           class XaiWalletApp extends StatelessWidget {
             const XaiWalletApp({super.key});
             @override
@@ -91,95 +82,59 @@ jobs:
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF080808)),
-                home: const SplashScreen(),
+                home: const WalletHome(),
               );
             }
           }
-          EOF
 
-          cat > lib/splash_screen.dart << 'EOF'
-          import 'package:flutter/material.dart';
-          import 'home_page.dart';
-          class SplashScreen extends StatefulWidget {
-            const SplashScreen({super.key});
+          class WalletHome extends StatefulWidget {
+            const WalletHome({super.key});
             @override
-            State<SplashScreen> createState() => _SplashScreenState();
+            State<WalletHome> createState() => _WalletHomeState();
           }
-          class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-            late AnimationController _controller;
+
+          class _WalletHomeState extends State<WalletHome> {
+            String walletId = 'Loading...';
+            
             @override
             void initState() {
               super.initState();
-              _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150))..repeat(reverse: true);
-              Future.delayed(const Duration(seconds: 3), () {
-                if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-              });
+              _loadWalletId();
             }
-            @override
-            void dispose() { _controller.dispose(); super.dispose(); }
+
+            Future<void> _loadWalletId() async {
+              final prefs = await SharedPreferences.getInstance();
+              String? id = prefs.getString('wallet_id');
+              if (id == null) {
+                id = 'WID${const Uuid().v4().replaceAll('-', '').substring(0, 16).toUpperCase()}';
+                await prefs.setString('wallet_id', id);
+              }
+              setState(() => walletId = id!);
+            }
+
             @override
             Widget build(BuildContext context) {
               return Scaffold(
-                backgroundColor: const Color(0xFF080808),
-                body: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 200, height: 200,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(colors: [const Color(0xFF00FF88).withOpacity(0.15 + _controller.value * 0.1), Colors.transparent]),
-                            ),
-                            child: CustomPaint(size: const Size(200, 200), painter: GreenLightningPainter(_controller.value)),
-                          ),
-                          const SizedBox(height: 40),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('X', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w300, color: Colors.white.withOpacity(0.9), letterSpacing: 12)),
-                              Text('A', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w300, color: Colors.white.withOpacity(0.9), letterSpacing: 12)),
-                              Text('I', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w300, color: Colors.white.withOpacity(0.9))),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Versale',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300,
-                              color: const Color(0xFF00FF88).withOpacity(0.8),
-                              letterSpacing: 8,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                appBar: AppBar(
+                  title: const Text('xAI Wallet'),
+                  backgroundColor: const Color(0xFF0A0A0A),
+                  centerTitle: true,
                 ),
-              );
-            }
-          }
-          class GreenLightningPainter extends CustomPainter {
-            final double animationValue;
-            GreenLightningPainter(this.animationValue);
-            @override
-            void paint(Canvas canvas, Size size) {
-              final paint = Paint()
-                ..color = const Color(0xFF00FF88).withOpacity(0.8 + animationValue * 0.2)
-                ..strokeWidth = 3
-                ..style = PaintingStyle.stroke;
-              final path = Path();
-              path.moveTo(size.width * 0.5, size.height * 0.2);
-              path.lineTo(size.width * 0.4, size.height * 0.45);
-              path.lineTo(size.width * 0.55, size.height * 0.45);
-              path.lineTo(size.width * 0.5, size.height * 0.8);
-              canvas.drawPath(path, paint);
-            }
-            @override
-            bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-          }
-          EOF
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 120, height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFF00FF88), width: 2),
+                        ),
+                        child: const Icon(Icons.account_balance_wallet, size: 60, color: Color(0xFF00FF88)),
+                      ),
+                      const SizedBox(height: 40),
+                      const Text('Wallet ID', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      const SizedBox(height: 8),
+                      SelectableText(
+                        walletId,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight

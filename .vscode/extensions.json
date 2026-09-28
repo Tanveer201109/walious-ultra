@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "dart-code.flutter",
+    "dart-code.dart-code",
+    "【entity-github¦canonical_name=【entity-GitHub¦canonical_name=GitHub】】.vscode-【entity-github¦canonical_name=GitHub】-actions",
+    "【entity-github¦canonical_name=GitHub】.copilot",
+    "【entity-github¦canonical_name=GitHub】.copilot-chat",
+    "ms-vscode.vscode-【entity-github¦canonical_name=GitHub】-actions-badge",
+    "ms-vscode.vscode-github-pullrequest",
+    "redhat.vscode-yaml",
+    "editorconfig.editorconfig",
+    "esbenp.prettier-vscode"
+  ],
+  "unwantedRecommendations": []
+}

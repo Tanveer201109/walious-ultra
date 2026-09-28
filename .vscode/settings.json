@@ -1,0 +1,8 @@
+{
+  "walious.ultra.githubExtensions": true,
+  "github.copilot.enable": {
+    "*": true
+  },
+  "dart.flutterSdkPath": GITHUB,
+  "editor.formatOnSave": true
+}
